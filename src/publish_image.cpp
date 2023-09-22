@@ -17,15 +17,35 @@
 #include <iostream>
 #include <vector>
 
-#include <cv_bridge/cv_bridge.hpp>
-#include <opencv2/core/mat.hpp>
-#include <opencv2/imgcodecs.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include "performance_transport/DataCollector.hpp"
-#include "performance_transport/PublisherImageTransport.hpp"
+#include "performance_transport/image_transport/PublisherImageTransport.hpp"
+#include "performance_transport/utils/DataCollector.hpp"
+#include "performance_transport/utils/ProcessInfo.hpp"
 
 using namespace std::chrono_literals;
+
+void statistics(std::string _filename, rclcpp::Clock::SharedPtr clock)
+{
+  performance_transport::DataCollector dataCollector(_filename);
+  dataCollector.WriteLine("timestamp, uptime, cpuusage, memory, AnonMemory, VM");
+  rclcpp::WallRate loop_rate(1);
+  ProcessInfo pinfo(getpid());
+
+  while (rclcpp::ok())
+  {
+    loop_rate.sleep();
+    pinfo.GetProcessMemoryUsed();
+    dataCollector.WriteLine(
+      std::to_string(clock->now().seconds()) + "," +
+      std::to_string(pinfo.GetProcessUptime()) + "," +
+      std::to_string(pinfo.GetProcessCPUUsage()) + "," +
+      std::to_string(pinfo.GetMemUsed()) + "," +
+      std::to_string(pinfo.GetMemAnonUsed()) + "," +
+      std::to_string(pinfo.GetMemVmUsed()));
+  }
+  dataCollector.Close();
+}
 
 int main(int argc, char ** argv)
 {
@@ -61,6 +81,12 @@ int main(int argc, char ** argv)
     std::to_string(size) + ".csv");
 
   auto start = std::chrono::high_resolution_clock::now();
+
+  std::thread t1(statistics,
+    "publisher_data_cpu_mem" + std::string("_") +
+    std::to_string(size) + std::string("_") +
+    std::to_string(size) + ".csv",
+    pit->get_clock());
 
   while (rclcpp::ok()) {
     loop_rate.sleep();

@@ -8,13 +8,18 @@
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
+  <depend>pcl_conversions</depend>
+
   <build_depend>cv_bridge</build_depend>
   <build_depend>image_transport</build_depend>
+  <build_depend>point_cloud_transport</build_depend>
   <build_depend>libopencv-dev</build_depend>
 
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>image_transport</exec_depend>
+  <exec_depend>point_cloud_transport</exec_depend>
   <exec_depend>libopencv-dev</exec_depend>
+  <exec_depend>libpcl-io</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

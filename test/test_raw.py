@@ -42,15 +42,13 @@ def generate_test_description():
         package='performance_transport',
         executable='publish_image',
         parameters=[{'camera.image.enable_pub_plugins':
-                     [['image_transport/', LaunchConfiguration('transport_type')]],
-                     'qos_overrides./parameter_events.publisher.reliability': 'best_effort'}],
+                     [['image_transport/', LaunchConfiguration('transport_type')]]}],
         arguments=[image_path, LaunchConfiguration('size')],
         output='screen')
 
     subscriber_image_node = Node(
         package='performance_transport',
-        executable='my_subscriber',
-        parameters=[{'qos_overrides./parameter_events.publisher.reliability': 'best_effort'}],
+        executable='subscribe_image',
         arguments=[LaunchConfiguration('transport_type')],
         output='screen')
 

@@ -38,10 +38,20 @@ ros2 run performance_transport publish_image <path_to_image> 4096 --ros-args -p 
 # Plot the results
 ```bash
 gnuplot
-plot './build/performance_transport/test/publisher_data_4096_4096.csv' with linespoints, './build/performance_transport/test/publisher_data_2048_2048.csv' with linespoints, './build/performance_transport/test/publisher_data_1024_1024.csv' with linespoints, './build/performance_transport/test/publisher_data_512_512.csv' with linespoints
-plot './build/performance_transport/test/subscriber_data_4096_4096.csv' with linespoints, './build/performance_transport/test/publisher_data_2048_2048.csv' with linespoints, './build/performance_transport/test/publisher_data_1024_1024.csv' with linespoints, './build/performance_transport/test/publisher_data_512_512.csv' with linespoints
+set datafile separator ","
+
+plot 'publisher_data_4096_4096.csv' with linespoints, 'publisher_data_2048_2048.csv' with linespoints, 'publisher_data_1024_1024.csv' with linespoints, 'publisher_data_512_512.csv' with linespoints
+plot './build/performance_transport/test/subscriber_data_4096_4096.csv' using 2:1 with linespoints, './build/performance_transport/test/subscriber_data_2048_2048.csv' using 2:1 with linespoints, './build/performance_transport/test/subscriber_data_1024_1024.csv' using 2:1 with linespoints, './build/performance_transport/test/subscriber_data_512_512.csv' using 2:1 with linespoints
 
 # Or all together
+plot 'publisher_data_4096_4096.csv' using 2:1 with linespoints, 'publisher_data_2048_2048.csv' using 2:1 with linespoints, 'publisher_data_1024_1024.csv' using 2:1 with linespoints, 'publisher_data_512_512.csv' using 2:1 with linespoints,'./build/performance_transport/test/subscriber_data_4096_4096.csv' using 2:1 with linespoints, './build/performance_transport/test/subscriber_data_2048_2048.csv' using 2:1 with linespoints, './build/performance_transport/test/subscriber_data_1024_1024.csv' using 2:1 with linespoints, './build/performance_transport/test/subscriber_data_512_512.csv' using 2:1 with linespoints
 
-plot './build/performance_transport/test/publisher_data_4096_4096.csv' with linespoints, './build/performance_transport/test/publisher_data_2048_2048.csv' with linespoints, './build/performance_transport/test/publisher_data_1024_1024.csv' with linespoints, './build/performance_transport/test/publisher_data_512_512.csv' with linespoints,'./build/performance_transport/test/subscriber_data_4096_4096.csv' with linespoints, './build/performance_transport/test/publisher_data_2048_2048.csv' with linespoints, './build/performance_transport/test/publisher_data_1024_1024.csv' with linespoints, './build/performance_transport/test/publisher_data_512_512.csv' with linespoints
+# mean time - message encode + message send + message decode
+plot './build/performance_transport/test/subscriber_data_4096_4096.csv' using 2:3 with linespoints, './build/performance_transport/test/subscriber_data_2048_2048.csv' using 2:3 with linespoints, './build/performance_transport/test/subscriber_data_1024_1024.csv' using 2:3 with linespoints, './build/performance_transport/test/subscriber_data_512_512.csv' using 2:3 with linespoints
+
+#uptime
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:2 with linespoints
+
+#cpu usage
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:3 with linespoints,
 ```
