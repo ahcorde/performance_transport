@@ -24,6 +24,10 @@ include_directories(include)
 add_library(performance_transport_utils SHARED
   src/utils/DataCollector.cpp
   src/utils/ProcessInfo.cpp
+  src/utils/SystemDataCollector.cpp
+)
+ament_target_dependencies(performance_transport_utils
+  rclcpp
 )
 
 # add the publisher example
@@ -72,15 +76,15 @@ target_link_libraries(publish_point_cloud
   performance_transport_utils
 )
 
-add_executable(subcribe_point_cloud
+add_executable(subscribe_point_cloud
   src/subscribe_point_cloud.cpp
   src/point_cloud_transport/SubscriberPointCloudTransport.cpp
 )
-ament_target_dependencies(subcribe_point_cloud
+ament_target_dependencies(subscribe_point_cloud
   point_cloud_transport
   rclcpp
 )
-target_link_libraries(subcribe_point_cloud
+target_link_libraries(subscribe_point_cloud
   performance_transport_utils
 )
 
@@ -90,7 +94,7 @@ install(
     publish_image
     subscribe_image
     publish_point_cloud
-    subcribe_point_cloud
+    subscribe_point_cloud
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 

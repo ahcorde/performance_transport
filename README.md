@@ -50,16 +50,29 @@ plot 'publisher_data_4096_4096.csv' using 2:1 with linespoints, 'publisher_data_
 plot './build/performance_transport/test/subscriber_data_4096_4096.csv' using 2:3 with linespoints, './build/performance_transport/test/subscriber_data_2048_2048.csv' using 2:3 with linespoints, './build/performance_transport/test/subscriber_data_1024_1024.csv' using 2:3 with linespoints, './build/performance_transport/test/subscriber_data_512_512.csv' using 2:3 with linespoints
 
 #uptime
-plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:2 with linespoints
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:2 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_2048_2048.csv' using 1:2 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_1024_1024.csv' using 1:2 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_512_512.csv' using 1:2 with linespoints
 
 #cpu usage
-plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:3 with linespoints,
-
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:3 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_2048_2048.csv' using 1:3 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_1024_1024.csv' using 1:3 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_512_512.csv' using 1:3 with linespoints
 Men
-plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:4 with linespoints,
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:4 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_2048_2048.csv' using 1:4 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_1024_1024.csv' using 1:4 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_512_512.csv' using 1:4 with linespoints
 
-plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:5 with linespoints,
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:5 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_2048_2048.csv' using 1:5 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_1024_1024.csv' using 1:5 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_512_512.csv' using 1:5 with linespoints
 
-plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:6 with linespoints,
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:6 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_2048_2048.csv' using 1:6 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_1024_1024.csv' using 1:6 with linespoints, './build/performance_transport/test/publisher_data_cpu_mem_512_512.csv' using 1:6 with linespoints
 
+
+# point cloud
+
+#uptime
+plot './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_2762400.csv' using 1:2 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_1179084.csv' using 1:2 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_75260.csv' using 1:2 with linespoints,
+
+#cpu usage
+plot './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_2762400.csv' using 1:3 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_1179084.csv' using 1:3 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_75260.csv' using 1:3 with linespoints,
+Men
+plot './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_2762400.csv' using 1:4 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_1179084.csv' using 1:4 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_75260.csv' using 1:4 with linespoints,
+
+plot './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_2762400.csv' using 1:5 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_1179084.csv' using 1:5 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_75260.csv' using 1:5with linespoints,
+
+plot './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_2762400.csv' using 1:6 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_1179084.csv' using 1:6 with linespoints, './build/performance_transport/test/publisher_point_cloud_data_cpu_mem_75260.csv' using 1:6 with linespoints,
 ```

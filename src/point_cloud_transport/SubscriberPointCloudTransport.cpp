@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "performance_transport/point_cloud_transport/SubscriberPointCloudTransport.hpp"
+#include "performance_transport/utils/utils.hpp"
 
 #include <point_cloud_transport/point_cloud_transport.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
@@ -29,19 +30,51 @@ SubscriberPointCloudTransport::SubscriberPointCloudTransport(
 
 SubscriberPointCloudTransport::~SubscriberPointCloudTransport()
 {
-  this->dataCollector_->Close();
-}
+  if (this->dataCollector_ != nullptr) {
+    this->dataCollector_->Close();
+  }
 
-inline double timeToSec(const builtin_interfaces::msg::Time & time_msg)
-{
-  auto ns = std::chrono::duration<double, std::nano>(time_msg.nanosec);
-  auto s = std::chrono::duration<double>(time_msg.sec);
-  return (s + std::chrono::duration_cast<std::chrono::duration<double>>(ns)).count();
+  if (systemDataCollector != nullptr) {
+    this->systemDataCollector->Close();
+  }
 }
 
 void SubscriberPointCloudTransport::pointCloudCallback(
   const sensor_msgs::msg::PointCloud2::ConstSharedPtr & msg)
 {
+  this->count_++;
+  if (systemDataCollector == nullptr) {
+    int size = msg->width * msg->height * msg->fields.size();
+    this->systemDataCollector = std::make_shared<SystemDataCollector>(
+      "subscriber_point_cloud_data_cpu_mem" + std::string("_") +
+      std::to_string(size) + ".csv",
+      this->get_clock());
+    this->dataCollector_ = std::make_shared<DataCollector>(
+      "subscriber_point_cloud_data" + std::string("_") +
+      std::to_string(size) + ".csv");
+    this->start = std::chrono::high_resolution_clock::now();
+  }
+
+  auto msg_time_stamp_seconds = timeToSec(msg->header.stamp);
+  auto current_time_stamp_seconds = timeToSec(this->now());
+
+  this->diff_time_sim_ += current_time_stamp_seconds - msg_time_stamp_seconds;
+
+  auto finish = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<float> elapsed = finish - this->start;
+  if (elapsed.count() > 1) {
+    double fps = static_cast<double>(this->count_) / static_cast<double>(elapsed.count());
+    double response_time = static_cast<double>(this->diff_time_sim_) /
+      static_cast<double>(this->count_);
+    this->count_ = 0;
+    this->diff_time_sim_ = 0;
+    this->start = std::chrono::high_resolution_clock::now();
+    if (dataCollector_ != nullptr) {
+      dataCollector_->WriteLine(
+        std::to_string(fps) + "," +
+        std::to_string(response_time));
+    }
+  }
 }
 
 void SubscriberPointCloudTransport::Initialize()

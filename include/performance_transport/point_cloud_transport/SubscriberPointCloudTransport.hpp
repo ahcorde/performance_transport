@@ -27,6 +27,7 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
 #include "performance_transport/utils/DataCollector.hpp"
+#include "performance_transport/utils/SystemDataCollector.hpp"
 
 namespace performance_transport
 {
@@ -47,6 +48,10 @@ private:
   std::string transport_hint_;
   std::shared_ptr<DataCollector> dataCollector_;
   std::chrono::time_point<std::chrono::system_clock> start;
+  std::shared_ptr<SystemDataCollector> systemDataCollector;
+
+  double diff_time_sim_{0};
+  int count_{0};
 };
 }  // namespace performance_transport
 

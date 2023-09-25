@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rclcpp/rclcpp.hpp"
-#include "performance_transport/point_cloud_transport/SubscriberPointCloudTransport.hpp"
+#ifndef PERFORMANCE_TRANSPORT__UTILS__UTILS_HPP_
+#define PERFORMANCE_TRANSPORT__UTILS__UTILS_HPP_
 
-int main(int argc, char ** argv)
+#include <chrono>
+
+#include <rclcpp/rclcpp.hpp>
+
+namespace performance_transport
 {
-  rclcpp::init(argc, argv);
-  rclcpp::NodeOptions options;
-  std::shared_ptr<performance_transport::SubscriberPointCloudTransport> node =
-    std::make_shared<performance_transport::SubscriberPointCloudTransport>(
-    options, argv[1]);
-
-  node->Initialize();
-
-  rclcpp::spin(node);
-
-  rclcpp::shutdown();
-
-  return 0;
+inline double timeToSec(const builtin_interfaces::msg::Time & time_msg)
+{
+  auto ns = std::chrono::duration<double, std::nano>(time_msg.nanosec);
+  auto s = std::chrono::duration<double>(time_msg.sec);
+  return (s + std::chrono::duration_cast<std::chrono::duration<double>>(ns)).count();
 }
+}  // namespace performance_transport
+
+#endif  // PERFORMANCE_TRANSPORT__UTILS__UTILS_HPP_

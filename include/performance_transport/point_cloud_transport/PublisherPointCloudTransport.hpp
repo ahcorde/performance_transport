@@ -32,8 +32,11 @@ public:
   PublisherPointCloudTransport(
     const rclcpp::NodeOptions & _options,
     const std::string & _filename);
+  ~PublisherPointCloudTransport();
   void Initialize();
   void PublishMessage();
+  int GetSize();
+  int GetNumberOfImagesPublished();
 
 private:
   std::shared_ptr<point_cloud_transport::PointCloudTransport> pc_;
@@ -41,6 +44,8 @@ private:
   sensor_msgs::msg::PointCloud2 cloud_msg_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::string filename_;
+  std::mutex mutex_;
+  int count_{0};
 };
 }  // namespace performance_transport
 

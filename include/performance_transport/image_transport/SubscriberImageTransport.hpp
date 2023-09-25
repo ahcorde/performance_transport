@@ -27,6 +27,7 @@
 #include <std_msgs/msg/int32.hpp>
 
 #include "performance_transport/utils/DataCollector.hpp"
+#include "performance_transport/utils/SystemDataCollector.hpp"
 
 namespace performance_transport
 {
@@ -53,6 +54,8 @@ private:
   int compress_{95};
   std::shared_ptr<DataCollector> dataCollector_;
   std::chrono::time_point<std::chrono::system_clock> start;
+
+  std::shared_ptr<SystemDataCollector> systemDataCollector;
 
   double diff_time_sim_{0};
 };

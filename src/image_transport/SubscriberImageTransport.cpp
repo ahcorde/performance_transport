@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "performance_transport/image_transport/SubscriberImageTransport.hpp"
+#include "performance_transport/utils/utils.hpp"
 
 #include <image_transport/image_transport.hpp>
 #include <sensor_msgs/msg/image.hpp>
@@ -53,15 +54,9 @@ void SubscriberImageTransport::compress_callback(const std_msgs::msg::Int32::Sha
   this->start = std::chrono::high_resolution_clock::now();
   if (this->compress_ == -5) {
     dataCollector_->Close();
+    systemDataCollector->Close();
     exit(0);
   }
-}
-
-inline double timeToSec(const builtin_interfaces::msg::Time & time_msg)
-{
-  auto ns = std::chrono::duration<double, std::nano>(time_msg.nanosec);
-  auto s = std::chrono::duration<double>(time_msg.sec);
-  return (s + std::chrono::duration_cast<std::chrono::duration<double>>(ns)).count();
 }
 
 void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
@@ -81,6 +76,12 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
       std::to_string(size_) + std::string("_") +
       std::to_string(size_) + ".csv");
     this->start = std::chrono::high_resolution_clock::now();
+
+    systemDataCollector = std::make_shared<SystemDataCollector>(
+      "subscriber_data_cpu_mem" + std::string("_") +
+      std::to_string(size_) + std::string("_") +
+      std::to_string(size_) + ".csv",
+      this->get_clock());
   }
 }
 

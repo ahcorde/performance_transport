@@ -25,66 +25,9 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include "performance_transport/utils/DataCollector.hpp"
+#include "performance_transport/utils/SystemDataCollector.hpp"
 #include "performance_transport/utils/ProcessInfo.hpp"
-
-int parseLine(char * line)
-{
-  // This assumes that a digit will be found and the line ends in " Kb".
-  int i = strlen(line);
-  const char * p = line;
-  while (*p < '0' || *p > '9') {p++;}
-  line[i - 3] = '\0';
-  i = atoi(p);
-  return i;
-}
-
-int getVirtualValue()  //  Note: this value is in KB!
-{
-  FILE * file = fopen("/proc/self/status", "r");
-  int result = -1;
-  char line[128];
-
-  while (fgets(line, 128, file) != NULL) {
-    if (strncmp(line, "VmSize:", 7) == 0) {
-      result = parseLine(line);
-      break;
-    }
-  }
-  fclose(file);
-  return result;
-}
-int getRSSAnonValue()  //  Note: this value is in KB!
-{
-  FILE * file = fopen("/proc/self/status", "r");
-  int result = -1;
-  char line[128];
-
-  while (fgets(line, 128, file) != NULL) {
-    if (strncmp(line, "RssAnon:", 7) == 0) {
-      result = parseLine(line);
-      break;
-    }
-  }
-  fclose(file);
-  return result;
-}
-
-void statistics()
-{
-  rclcpp::WallRate loop_rate(1);
-  ProcessInfo pinfo(getpid());
-  while (rclcpp::ok()) {
-    loop_rate.sleep();
-    pinfo.GetProcessMemoryUsed();
-    std::cout << "GetProcessUptime() " << pinfo.GetProcessUptime() << std::endl;
-    std::cout << "GetProcessCPUUsage() " << pinfo.GetProcessCPUUsage() << std::endl;
-    std::cout << "GetProcessMemoryUsed() "
-              << pinfo.GetMemUsed() << " Anon: "
-              << pinfo.GetMemAnonUsed() << " VM: "
-              << pinfo.GetMemVmUsed() << std::endl;
-    std::cout << "GetProcessThreadCount() " << pinfo.GetProcessThreadCount() << std::endl;
-  }
-}
 
 int main(int argc, char * argv[])
 {
@@ -103,15 +46,57 @@ int main(int argc, char * argv[])
 
   rclcpp::WallRate loop_rate(30);
 
-  std::thread t1(statistics);
+  int size = ppc->GetSize();
+
+  performance_transport::SystemDataCollector systemDataCollector =
+    performance_transport::SystemDataCollector(
+    "publisher_point_cloud_data_cpu_mem" + std::string("_") +
+    std::to_string(size) + ".csv",
+    ppc->get_clock());
+
+  performance_transport::DataCollector dataCollector(
+    "publisher_point_cloud_data" + std::string("_") +
+    std::to_string(size) + ".csv");
+
+  int loop_time = 20;  // seconds
+
+  auto start_loop = std::chrono::high_resolution_clock::now();
+  auto start = std::chrono::high_resolution_clock::now();
 
   while (rclcpp::ok()) {
     loop_rate.sleep();
 
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> elapsed = finish - start;
+    if (elapsed.count() > 1) {
+      double fps = static_cast<double>(ppc->GetNumberOfImagesPublished()) /
+        static_cast<double>(elapsed.count());
+      dataCollector.WriteLine(
+        std::to_string(fps));
+      start = finish;
+    }
+
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish - start_loop;
+
+    if (elapsed.count() > loop_time) {
+      break;
+    }
+
     rclcpp::spin_some(ppc);
   }
 
+  std::cout << "exit loop" << std::endl;
+
+  systemDataCollector.Close();
+  dataCollector.Close();
+  std::cout << "exit loop2" << std::endl;
+
+  ppc.reset();
+  std::cout << "exit loop3" << std::endl;
+
   rclcpp::shutdown();
+  std::cout << "exit loop4" << std::endl;
 
   return 0;
 }

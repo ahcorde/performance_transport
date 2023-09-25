@@ -35,17 +35,36 @@ PublisherPointCloudTransport::PublisherPointCloudTransport(
 : Node("publisher_point_cloud_transport", _options),
   filename_(_filename)
 {
-  timer_ = this->create_wall_timer(
+  this->timer_ = this->create_wall_timer(
     33ms,
     std::bind(&PublisherPointCloudTransport::PublishMessage, this));
 }
 
+PublisherPointCloudTransport::~PublisherPointCloudTransport()
+{
+  this->timer_->cancel();
+}
+
+int PublisherPointCloudTransport::GetSize()
+{
+  return cloud_msg_.height * cloud_msg_.width * cloud_msg_.fields.size();
+}
+
+int PublisherPointCloudTransport::GetNumberOfImagesPublished()
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  int result = this->count_;
+  this->count_ = 0;
+  return result;
+}
+
 void PublisherPointCloudTransport::PublishMessage()
 {
-  // std::lock_guard<std::mutex> lock(mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
   this->cloud_msg_.header.stamp = this->now();
   this->cloud_msg_.header.frame_id = "camera_link";
   this->pub_.publish(this->cloud_msg_);
+  this->count_++;
 }
 
 void PublisherPointCloudTransport::Initialize()
@@ -55,7 +74,7 @@ void PublisherPointCloudTransport::Initialize()
   this->pub_ = this->pc_->advertise("pct/point_cloud", 10);
   if (this->filename_ == "" || pcl::io::loadPCDFile(this->filename_, this->cloud_msg_) == -1) {
     RCLCPP_ERROR(this->get_logger(), "failed to open PCD file");
-    throw std::runtime_error{"could not open pcd file"};
+    throw std::runtime_error{"could not open PCD file"};
   }
 }
 
