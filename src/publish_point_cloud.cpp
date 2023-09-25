@@ -1,3 +1,23 @@
+// Copyright 2023 Open Source Robotics Foundation, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/times.h>
+
 #include <memory>
 #include <string>
 
@@ -5,17 +25,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
-#include "sys/times.h"
-
 #include "performance_transport/utils/ProcessInfo.hpp"
-
-static clock_t lastCPU, lastSysCPU, lastUserCPU;
-static clock_t init_UserCPU, cpu_time;
-static int numProcessors;
-
 
 int parseLine(char * line)
 {
@@ -28,7 +38,7 @@ int parseLine(char * line)
   return i;
 }
 
-int getVirtualValue()  //Note: this value is in KB!
+int getVirtualValue()  //  Note: this value is in KB!
 {
   FILE * file = fopen("/proc/self/status", "r");
   int result = -1;
@@ -43,7 +53,7 @@ int getVirtualValue()  //Note: this value is in KB!
   fclose(file);
   return result;
 }
-int getRSSAnonValue()  //Note: this value is in KB!
+int getRSSAnonValue()  //  Note: this value is in KB!
 {
   FILE * file = fopen("/proc/self/status", "r");
   int result = -1;
@@ -69,9 +79,9 @@ void statistics()
     std::cout << "GetProcessUptime() " << pinfo.GetProcessUptime() << std::endl;
     std::cout << "GetProcessCPUUsage() " << pinfo.GetProcessCPUUsage() << std::endl;
     std::cout << "GetProcessMemoryUsed() "
-                << pinfo.GetMemUsed() << " Anon: "
-                << pinfo.GetMemAnonUsed() << " VM: "
-                << pinfo.GetMemVmUsed() << std::endl;
+              << pinfo.GetMemUsed() << " Anon: "
+              << pinfo.GetMemAnonUsed() << " VM: "
+              << pinfo.GetMemVmUsed() << std::endl;
     std::cout << "GetProcessThreadCount() " << pinfo.GetProcessThreadCount() << std::endl;
   }
 }

@@ -54,4 +54,12 @@ plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' u
 
 #cpu usage
 plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:3 with linespoints,
+
+Men
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:4 with linespoints,
+
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:5 with linespoints,
+
+plot './build/performance_transport/test/publisher_data_cpu_mem_4096_4096.csv' using 1:6 with linespoints,
+
 ```

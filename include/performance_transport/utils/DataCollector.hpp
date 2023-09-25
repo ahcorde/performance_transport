@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PERFORMANCE_TRANSPORT__DATACOLLECTOR_HPP_
-#define PERFORMANCE_TRANSPORT__DATACOLLECTOR_HPP_
+#ifndef PERFORMANCE_TRANSPORT__UTILS__DATACOLLECTOR_HPP_
+#define PERFORMANCE_TRANSPORT__UTILS__DATACOLLECTOR_HPP_
 
 #include <string>
 #include <fstream>
@@ -36,4 +36,4 @@ private:
   std::ofstream outputfile_;
 };
 }  // namespace performance_transport
-#endif  // PERFORMANCE_TRANSPORT__DATACOLLECTOR_HPP_
+#endif  // PERFORMANCE_TRANSPORT__UTILS__DATACOLLECTOR_HPP_

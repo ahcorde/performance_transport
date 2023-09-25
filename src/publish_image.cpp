@@ -25,6 +25,8 @@
 
 using namespace std::chrono_literals;
 
+bool stop = false;
+
 void statistics(std::string _filename, rclcpp::Clock::SharedPtr clock)
 {
   performance_transport::DataCollector dataCollector(_filename);
@@ -32,8 +34,7 @@ void statistics(std::string _filename, rclcpp::Clock::SharedPtr clock)
   rclcpp::WallRate loop_rate(1);
   ProcessInfo pinfo(getpid());
 
-  while (rclcpp::ok())
-  {
+  while (rclcpp::ok() && !stop) {
     loop_rate.sleep();
     pinfo.GetProcessMemoryUsed();
     dataCollector.WriteLine(
@@ -113,8 +114,9 @@ int main(int argc, char ** argv)
     }
     rclcpp::spin_some(pit);
   }
-
+  stop = true;
   pit->SetCompressJpeg(-5);
+  t1.join();
 
   rclcpp::shutdown();
 }

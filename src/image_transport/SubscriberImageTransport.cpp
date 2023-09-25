@@ -72,13 +72,6 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
   auto msg_time_stamp_seconds = timeToSec(msg->header.stamp);
   auto current_time_stamp_seconds = timeToSec(this->now());
 
-  // builtin_interfaces::msg::Time n = this->now();
-
-  // std::cout << "msg->header.stamp " << msg->header.stamp.sec << " " << msg->header.stamp.nanosec << std::endl;;
-  // std::cout << "msg->header.stamp " << n.sec << " " << n.nanosec << std::endl;;
-
-  // std::cout << "diff  " << current_time_stamp_seconds - msg_time_stamp_seconds << std::endl;
-
   this->diff_time_sim_ += current_time_stamp_seconds - msg_time_stamp_seconds;
 
   if (this->size_ != msg->width) {
