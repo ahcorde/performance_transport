@@ -64,8 +64,6 @@ int main(int argc, char * argv[])
   auto start = std::chrono::high_resolution_clock::now();
 
   while (rclcpp::ok()) {
-    loop_rate.sleep();
-
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed = finish - start;
     if (elapsed.count() > 1) {
@@ -80,9 +78,10 @@ int main(int argc, char * argv[])
     elapsed = finish - start_loop;
 
     if (elapsed.count() > loop_time) {
-      break;
+      // break;
     }
 
+    loop_rate.sleep();
     rclcpp::spin_some(ppc);
   }
 

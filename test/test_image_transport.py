@@ -41,18 +41,34 @@ def generate_test_description():
     publish_image_node = Node(
         package='performance_transport',
         executable='publish_image',
-        parameters=[{'camera.image.enable_pub_plugins':
-                     [['image_transport/', LaunchConfiguration('transport_type')]]}],
-        arguments=[image_path, LaunchConfiguration('size')],
+        parameters=[{'filename' : image_path,
+                     'size': LaunchConfiguration('size'),
+                     'compress': LaunchConfiguration('compress'),
+                     'compress_type': LaunchConfiguration('compress_type'),
+                     'transport_hint': LaunchConfiguration('transport_type'),
+                     'camera.image.enable_pub_plugins':[['image_transport/', LaunchConfiguration('transport_type')]]
+                     }],
         output='screen')
 
     subscriber_image_node = Node(
         package='performance_transport',
         executable='subscribe_image',
-        arguments=[LaunchConfiguration('transport_type')],
+        parameters=[{'compress_type': LaunchConfiguration('compress_type'),
+                     'transport_hint': LaunchConfiguration('transport_type')
+        }],
         output='screen')
 
     return launch.LaunchDescription([
+        DeclareLaunchArgument(
+            'compress',
+            default_value=['10'],
+            description='Compress value',
+        ),
+        DeclareLaunchArgument(
+            'compress_type',
+            default_value=[''],
+            description='Compress type',
+        ),
         DeclareLaunchArgument(
             'size',
             default_value=['4096'],
@@ -60,7 +76,7 @@ def generate_test_description():
         ),
         DeclareLaunchArgument(
             'transport_type',
-            default_value=['compressed'],
+            default_value=[''],
             description='Transport type',
         ),
         subscriber_image_node,

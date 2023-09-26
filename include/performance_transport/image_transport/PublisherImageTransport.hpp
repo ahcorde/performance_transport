@@ -32,20 +32,22 @@ class PublisherImageTransport : public rclcpp::Node
 {
 public:
   PublisherImageTransport(
-    const rclcpp::NodeOptions & _options,
-    const std::string & _filename);
+    const rclcpp::NodeOptions & _options);
+  ~PublisherImageTransport();
   void Initialize();
   void PublishMessage();
   void SetImageSize(int _width, int _height);
   int Width();
   int Height();
   void SetCompressJpeg(int _value);
+  void SetCompressJpegParameter();
   int GetNumberOfImagesPublished();
-
+  void SetCompressType();
+  void SetFilename(const std::string & _filename);
+  void SetCompressType(const std::string & _compress_type);
 private:
   std::shared_ptr<image_transport::ImageTransport> it;
   image_transport::Publisher pub;
-  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr compress_pub_;
 
   cv::Mat image_;
   std::string filename_;
@@ -54,6 +56,7 @@ private:
   std::mutex mutex_;
   int count{0};
   int compress_{0};
+  std::string compress_type_;
 };
 }  // namespace performance_transport
 

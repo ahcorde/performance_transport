@@ -33,6 +33,13 @@ public:
   double GetMemAnonUsed();
   double GetMemVmUsed();
 
+  void GetNetworkStats();
+
+  double GetReceivedMbytes();
+  double GetTransmitedMbytes();
+  uint32_t GetReceivedPackets();
+  uint32_t GetTransmitedPackets();
+
 private:
   uint32_t mProcessId;
   int32_t mJiffiesPerSecond;
@@ -43,6 +50,16 @@ private:
   double mlMemUsed;
   double mlMemAnonUsed;
   double mlMemVmUsed;
+
+  uint64_t r_bytes_prev{0};
+  uint64_t t_bytes_prev{0};
+  uint64_t r_packets_prev{0};
+  uint64_t t_packets_prev{0};
+
+  double rbytes;
+  double tbytes;
+  uint32_t rpackets;
+  uint32_t tpackets;
 };
 
 #endif  // PERFORMANCE_TRANSPORT__UTILS__PROCESSINFO_HPP_

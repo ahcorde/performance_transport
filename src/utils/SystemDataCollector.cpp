@@ -33,20 +33,26 @@ SystemDataCollector::SystemDataCollector(
 void SystemDataCollector::loop()
 {
   performance_transport::DataCollector dataCollector(this->filename_);
-  dataCollector.WriteLine("timestamp, uptime, cpuusage, memory, anonmemory, vm");
+  dataCollector.WriteLine("timestamp, uptime, cpuusage, memory, anonmemory, vm, "
+                          "rmbytes, tmbytes, rpackets, tpackets");
   rclcpp::WallRate loop_rate(1);
   ProcessInfo pinfo(getpid());
 
   while (rclcpp::ok() && !this->stop_) {
     loop_rate.sleep();
     pinfo.GetProcessMemoryUsed();
+    pinfo.GetNetworkStats();
     dataCollector.WriteLine(
       std::to_string(this->clock_->now().seconds()) + "," +
       std::to_string(pinfo.GetProcessUptime()) + "," +
       std::to_string(pinfo.GetProcessCPUUsage()) + "," +
       std::to_string(pinfo.GetMemUsed()) + "," +
       std::to_string(pinfo.GetMemAnonUsed()) + "," +
-      std::to_string(pinfo.GetMemVmUsed()));
+      std::to_string(pinfo.GetMemVmUsed()) + "," +
+      std::to_string(pinfo.GetReceivedMbytes()) + "," +
+      std::to_string(pinfo.GetTransmitedMbytes()) + "," +
+      std::to_string(pinfo.GetReceivedPackets()) + "," +
+      std::to_string(pinfo.GetTransmitedPackets()));
   }
   dataCollector.Close();
 }
@@ -64,3 +70,44 @@ void SystemDataCollector::Close()
 }
 
 }  // namespace performance_transport
+
+// int num_bytes_per_sec = 0;
+// int max_bytes_per_sec = 0;
+// long int max_bytes_per_sec_timestamp = 0;
+// long int ref_time = 0;
+// char msg_data[30000];
+
+// while (!feof(fp))
+//     {
+//         // read next message size
+//         int memsz;
+//         read = fread (&memsz, sizeof(int), 1, fp);
+//         if (read == 0)
+//         {
+//             if (ferror(fp))
+//                 printf("error reading. %d\n", read);
+//             break;
+//         }
+//         assert(read == 1);
+
+//         // read the message
+//         read = fread (msg_data, sizeof(char), memsz, fp);
+//         assert(read = memsz);
+
+//         // the foo method extracts the event time from the message, in ms
+//         time_t event_time = 0;
+//         foo (msg_data, &event_time);
+
+//         // track bandwidth
+//         if (ref_time == 0 || event_time - ref_time > 1000)
+//         {
+//             if (num_bytes_per_sec > max_bytes_per_sec)
+//             {
+//                 max_bytes_per_sec = num_bytes_per_sec;
+//                 max_bytes_per_sec_timestamp = event_time;
+//             }
+//             num_bytes_per_sec = 0;
+//             ref_time = event_time;
+//         }
+//         num_bytes_per_sec += sizeof(char) * strlen(msg_data);
+// }

@@ -35,29 +35,33 @@ class SubscriberImageTransport : public rclcpp::Node
 {
 public:
   SubscriberImageTransport(
-    const rclcpp::NodeOptions & _options,
-    const std::string & _transport_hint);
+    const rclcpp::NodeOptions & _options);
   ~SubscriberImageTransport();
   void Initialize();
+  void checkSubscribers();
 
+  void SetTransportHint(const std::string & _transport_hint);
+  void SetCompressType(const std::string & _compress_type);
 private:
   void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
-  void compress_callback(const std_msgs::msg::Int32::SharedPtr msg);
 
   std::shared_ptr<image_transport::ImageTransport> it;
   image_transport::Subscriber sub;
-  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription_compress_;
   std::string transport_hint_;
   std::mutex mutex_;
   int count_{0};
   unsigned int size_{0};
   int compress_{95};
+  rclcpp::TimerBase::SharedPtr timer_;
   std::shared_ptr<DataCollector> dataCollector_;
   std::chrono::time_point<std::chrono::system_clock> start;
+
+  std::string compress_type_{};
 
   std::shared_ptr<SystemDataCollector> systemDataCollector;
 
   double diff_time_sim_{0};
+  double last_update{0};
 };
 }  // namespace performance_transport
 

@@ -13,6 +13,10 @@
 // limitations under the License.
 #include "performance_transport/utils/ProcessInfo.hpp"
 
+#include <algorithm>
+#include <iostream>
+#include <string>
+
 #include <sys/sysinfo.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -71,10 +75,74 @@ ProcessInfo::ProcessInfo(uint32_t iProcessId)
 
     fclose(lpFile);
   }
+
+  GetNetworkStats();
 }
 
 ProcessInfo::~ProcessInfo() throw()
 {
+}
+
+void ProcessInfo::GetNetworkStats()
+{
+  uint64_t r_bytes{0};
+  uint64_t t_bytes{0};
+  uint64_t r_packets{0};
+  uint64_t t_packets{0};
+
+  std::string net_filename = std::string("/proc/") + std::to_string(getpid()) + std::string("/net/dev");
+  FILE *fp = fopen(net_filename.c_str(), "r");
+  char buf[200];
+  char ifname[20];
+
+  // skip first two lines
+  for (int i = 0; i < 2; i++) {
+      fgets(buf, 200, fp);
+  }
+
+  while (fgets(buf, 200, fp)) {
+    sscanf(buf, "%[^:]: %lu %lu %*lu %*lu %*lu %*lu %*lu %*lu %lu %lu",
+            ifname, &r_bytes, &r_packets, &t_bytes, &t_packets);
+
+    std::string ifname_s{ifname};
+    std::string::iterator end_pos = std::remove(ifname_s.begin(), ifname_s.end(), ' ');
+    ifname_s.erase(end_pos, ifname_s.end());
+    if (ifname_s == "lo")
+    {
+      rbytes = static_cast<int>(r_bytes - r_bytes_prev) / 1024.0 / 1024.0;
+      tbytes = static_cast<int>(t_bytes - t_bytes_prev) / 1024.0 / 1024.0;
+      rpackets = static_cast<int>(r_packets - r_packets_prev);
+      tpackets = static_cast<int>(t_packets - t_packets_prev);
+
+      std::cout << "rbytes " << rbytes << " tbytes " << tbytes << std::endl;
+      std::cout << "rpackets " << rpackets << " t_packets " << tpackets << std::endl;
+
+      r_bytes_prev = r_bytes;
+      t_bytes_prev = t_bytes;
+      r_packets_prev = r_packets;
+      t_packets_prev = t_packets;
+    }
+  }
+}
+
+double ProcessInfo::GetReceivedMbytes()
+{
+  return this->rbytes;
+}
+
+double ProcessInfo::GetTransmitedMbytes()
+{
+  return this->tbytes;
+}
+
+uint32_t ProcessInfo::GetReceivedPackets()
+{
+  return this->rpackets;
+}
+
+uint32_t ProcessInfo::GetTransmitedPackets()
+{
+  return this->tpackets;
 }
 
 uint32_t ProcessInfo::GetProcessId()

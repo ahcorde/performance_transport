@@ -31,16 +31,29 @@ using namespace std::chrono_literals;
 namespace performance_transport
 {
 PublisherImageTransport::PublisherImageTransport(
-  const rclcpp::NodeOptions & _options,
-  const std::string & _filename)
-: Node("publisher_image_transport", _options),
-  filename_(_filename)
+  const rclcpp::NodeOptions & _options)
+: Node("publisher_image_transport", _options)
 {
-  this->compress_pub_ = this->create_publisher<std_msgs::msg::Int32>("compress", 10);
-
   timer_ = this->create_wall_timer(
     33ms,
     std::bind(&PublisherImageTransport::PublishMessage, this));
+}
+
+void PublisherImageTransport::SetFilename(
+  const std::string & _filename)
+{
+  this->filename_ = _filename;
+}
+
+void PublisherImageTransport::SetCompressType(
+  const std::string & _compress_type)
+{
+  this->compress_type_ = _compress_type;
+}
+
+PublisherImageTransport::~PublisherImageTransport()
+{
+  this->timer_->cancel();
 }
 
 void PublisherImageTransport::SetImageSize(int _width, int _height)
@@ -70,6 +83,11 @@ void PublisherImageTransport::PublishMessage()
   std::lock_guard<std::mutex> lock(mutex_);
   this->msg_->header.stamp = this->now();
   this->pub.publish(this->msg_);
+  if (this->count == 0)
+  {
+    SetCompressJpegParameter();
+    SetCompressType();
+  }
   count++;
 }
 
@@ -90,27 +108,27 @@ void PublisherImageTransport::Initialize()
 
 void PublisherImageTransport::SetCompressJpeg(int _value)
 {
+  std::lock_guard<std::mutex> lock(mutex_);
+  this->compress_ = _value;
+}
+
+void PublisherImageTransport::SetCompressJpegParameter()
+{
+  if (this->compress_type_ == "jpeg")
   {
-    std::lock_guard<std::mutex> lock(mutex_);
-    this->compress_ = _value;
-  }
-
-  std_msgs::msg::Int32 msg_compress;
-  msg_compress.data = _value;
-  this->compress_pub_->publish(msg_compress);
-
-  auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(this->shared_from_this());
-
-  // Set several different types of parameters.
-  auto set_parameters_results = parameters_client->set_parameters(
-    {
-      rclcpp::Parameter("camera.image.compressed.jpeg_quality", _value),
-    });
-  // Check to see if they were set.
-  for (auto & result : set_parameters_results) {
-    if (!result.successful) {
-      RCLCPP_ERROR(this->get_logger(), "Failed to set parameter: %s", result.reason.c_str());
-    }
+    this->set_parameter(rclcpp::Parameter("camera.image.compressed.jpeg_quality", this->compress_));
+  } else if (this->compress_type_ == "png")
+  {
+    this->set_parameter(rclcpp::Parameter("camera.image.compressed.png_level", this->compress_));
   }
 }
+
+void PublisherImageTransport::SetCompressType()
+{
+  if (this->compress_type_ == "jpeg" || this->compress_type_ == "png")
+  {
+    this->set_parameter(rclcpp::Parameter("camera.image.compressed.format", this->compress_type_));
+  }
+}
+
 }  // namespace performance_transport

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+#include <iostream>
 #include "rclcpp/rclcpp.hpp"
 #include "performance_transport/image_transport/SubscriberImageTransport.hpp"
 
@@ -20,7 +20,20 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   std::shared_ptr<performance_transport::SubscriberImageTransport> node =
-    std::make_shared<performance_transport::SubscriberImageTransport>(options, argv[1]);
+    std::make_shared<performance_transport::SubscriberImageTransport>(options);
+
+  node->declare_parameter("transport_hint", "raw");
+  std::string transport_hint{""};
+  node->get_parameter("transport_hint", transport_hint);
+  node->SetTransportHint(transport_hint);
+
+  node->declare_parameter("compress_type", "");
+  std::string compress_type{""};
+  node->get_parameter("compress_type", compress_type);
+  node->SetCompressType(compress_type);
+
+  std::cout << "transport_hint " << transport_hint << std::endl;
+  std::cout << "compress_type " << compress_type << std::endl;
 
   node->Initialize();
 

@@ -36,64 +36,107 @@ int main(int argc, char ** argv)
     return -1;
   }
 
-  std::string filename = argv[1];
-
   std::shared_ptr<performance_transport::PublisherImageTransport> pit =
-    std::make_shared<performance_transport::PublisherImageTransport>(options, filename);
+    std::make_shared<performance_transport::PublisherImageTransport>(
+      options);
+
+  pit->declare_parameter("filename", "");
+  std::string filename;
+  pit->get_parameter("filename", filename);
+  pit->SetFilename(filename);
+
+  pit->declare_parameter("size", 4096);
+  int size = 0;
+  pit->get_parameter("size", size);
+
+  pit->declare_parameter("compress", 0);
+  int compress = 0;
+  pit->get_parameter("compress", compress);
+
+  pit->declare_parameter("compress_type", "");
+  std::string compress_type{""};
+  pit->get_parameter("compress_type", compress_type);
+  pit->SetCompressType(compress_type);
+
+  pit->declare_parameter("loop_time", 10);
+  int loop_time{10};
+  pit->get_parameter("loop_time", loop_time);
+
+  pit->declare_parameter("transport_hint", "raw");
+  std::string transport_hint{""};
+  pit->get_parameter("transport_hint", transport_hint);
+
+  std::cout << "Filename " << filename << std::endl;
+  std::cout << "size " << size << std::endl;
+  std::cout << "compress " << compress << std::endl;
+  std::cout << "compress_type " << compress_type << std::endl;
+  std::cout << "transport_hint " << transport_hint << std::endl;
+  std::cout << "loop_time " << loop_time << std::endl;
 
   pit->Initialize();
 
-  int loop_time = 1;  // seconds
-
   rclcpp::WallRate loop_rate(30);
 
-  int size = std::atoi(argv[2]);
-
   pit->SetImageSize(size, size);
-
-  int compress = 95;
-
   pit->SetCompressJpeg(compress);
 
-  performance_transport::DataCollector dataCollector("publisher_data" + std::string("_") +
+  std::string filenameStats = "publisher_data" + std::string("_") +
     std::to_string(size) + std::string("_") +
-    std::to_string(size) + ".csv");
+    std::to_string(size) + std::string("_") +
+    transport_hint;
 
-  auto start = std::chrono::high_resolution_clock::now();
+  std::string filenameSystemData = "publisher_data_cpu_mem" + std::string("_") +
+    std::to_string(size) + std::string("_") +
+    std::to_string(size) + std::string("_") +
+    transport_hint;
+
+  if (transport_hint == "compressed")
+  {
+    filenameStats += std::string("_") + compress_type;
+    filenameStats += std::string("_") + std::to_string(compress);
+
+    filenameSystemData += std::string("_") + compress_type;
+    filenameSystemData += std::string("_") + std::to_string(compress);
+  }
+
+  filenameStats += ".csv";
+  filenameSystemData += ".csv";
+
+  performance_transport::DataCollector dataCollector(filenameStats);
 
   performance_transport::SystemDataCollector systemDataCollector =
     performance_transport::SystemDataCollector(
-    "publisher_data_cpu_mem" + std::string("_") +
-    std::to_string(size) + std::string("_") +
-    std::to_string(size) + ".csv", pit->get_clock());
+    filenameSystemData,
+    pit->get_clock());
+
+  auto start_loop = std::chrono::high_resolution_clock::now();
+  auto start = std::chrono::high_resolution_clock::now();
 
   while (rclcpp::ok()) {
-    loop_rate.sleep();
-
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed = finish - start;
 
-    if (elapsed.count() > loop_time) {
+    if (elapsed.count() > 1) {
       double fps = static_cast<double>(pit->GetNumberOfImagesPublished()) /
         static_cast<double>(elapsed.count());
-      std::cout << size << " " << size << " published in " << loop_time << " seconds: " << fps <<
-        " " << elapsed.count() << " compress " << compress << std::endl;
-
-      dataCollector.WriteLine(
-        std::to_string(fps) + std::string(",") +
-        std::to_string(compress));
-
-      compress -= 10;
-      if (compress < 0) {
-        break;
-      }
-      pit->SetCompressJpeg(compress);
+      std::cout << size << " " << size << " published in " << loop_time << " seconds: "
+                << fps << " " << elapsed.count() << " compress " << compress << std::endl;
+      dataCollector.WriteLine(std::to_string(fps));
       start = finish;
     }
+
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish - start_loop;
+
+    if (elapsed.count() > loop_time) {
+      break;
+    }
+    loop_rate.sleep();
     rclcpp::spin_some(pit);
   }
-  pit->SetCompressJpeg(-5);
+
   systemDataCollector.Close();
+  dataCollector.Close();
 
   rclcpp::shutdown();
   return 0;
