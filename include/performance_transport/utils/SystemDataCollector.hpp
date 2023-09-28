@@ -37,7 +37,6 @@ public:
 
 private:
   std::string filename_;
-  std::ofstream outputfile_;
   rclcpp::Clock::SharedPtr clock_;
   bool stop_{false};
   std::thread thread;

@@ -45,6 +45,8 @@ public:
   void SetCompressType();
   void SetFilename(const std::string & _filename);
   void SetCompressType(const std::string & _compress_type);
+  void Destroy();
+
 private:
   std::shared_ptr<image_transport::ImageTransport> it;
   image_transport::Publisher pub;

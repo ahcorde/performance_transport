@@ -21,11 +21,24 @@ int main(int argc, char ** argv)
   rclcpp::NodeOptions options;
   std::shared_ptr<performance_transport::SubscriberPointCloudTransport> node =
     std::make_shared<performance_transport::SubscriberPointCloudTransport>(
-    options, argv[1]);
+      options);
+
+  node->declare_parameter("transport_hint", "raw");
+  std::string transport_hint{""};
+  node->get_parameter("transport_hint", transport_hint);
+  node->SetTransportHint(transport_hint);
 
   node->Initialize();
 
-  rclcpp::spin(node);
+  rclcpp::WallRate loop_rate(30);
+
+  while(rclcpp::ok() && !node->IsFinished())
+  {
+    rclcpp::spin_some(node);
+    loop_rate.sleep();
+  }
+
+  node->Destroy();
 
   rclcpp::shutdown();
 

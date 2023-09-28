@@ -37,7 +37,15 @@ int main(int argc, char ** argv)
 
   node->Initialize();
 
-  rclcpp::spin(node);
+  rclcpp::WallRate loop_rate(30);
+
+  while(rclcpp::ok() && !node->IsFinished())
+  {
+    rclcpp::spin_some(node);
+    loop_rate.sleep();
+  }
+
+  node->Destroy();
 
   rclcpp::shutdown();
 

@@ -58,8 +58,8 @@ int main(int argc, char ** argv)
   pit->get_parameter("compress_type", compress_type);
   pit->SetCompressType(compress_type);
 
-  pit->declare_parameter("loop_time", 10);
-  int loop_time{10};
+  pit->declare_parameter("loop_time", 300);
+  int loop_time{300};
   pit->get_parameter("loop_time", loop_time);
 
   pit->declare_parameter("transport_hint", "raw");
@@ -119,8 +119,8 @@ int main(int argc, char ** argv)
     if (elapsed.count() > 1) {
       double fps = static_cast<double>(pit->GetNumberOfImagesPublished()) /
         static_cast<double>(elapsed.count());
-      std::cout << size << " " << size << " published in " << loop_time << " seconds: "
-                << fps << " " << elapsed.count() << " compress " << compress << std::endl;
+      // std::cout << size << " " << size << " published in " << loop_time << " seconds: "
+      //           << fps << " " << elapsed.count() << " compress " << compress << std::endl;
       dataCollector.WriteLine(std::to_string(fps));
       start = finish;
     }
@@ -137,6 +137,8 @@ int main(int argc, char ** argv)
 
   systemDataCollector.Close();
   dataCollector.Close();
+
+  pit->Destroy();
 
   rclcpp::shutdown();
   return 0;

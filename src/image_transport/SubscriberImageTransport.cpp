@@ -59,19 +59,36 @@ SubscriberImageTransport::~SubscriberImageTransport()
   }
 }
 
+void SubscriberImageTransport::Destroy()
+{
+  if (this->dataCollector_ != nullptr) {
+    this->dataCollector_->Close();
+  }
+
+  if (systemDataCollector != nullptr) {
+    this->systemDataCollector->Close();
+  }
+  this->timer_->cancel();
+
+  this->sub.shutdown();
+  this->it.reset();
+  this->timer_->cancel();
+}
+
+
+bool SubscriberImageTransport::IsFinished()
+{
+  return this->stop_;
+}
+
 void SubscriberImageTransport::checkSubscribers()
 {
-  std::cout << "this->sub.getNumPublishers() " << this->sub.getNumPublishers() << std::endl;
-
   auto current_time_stamp_seconds = timeToSec(this->now());
   auto diff = current_time_stamp_seconds - this->last_update;
 
   if (diff > 1)
   {
-    this->timer_->cancel();
-    this->dataCollector_->Close();
-    this->systemDataCollector->Close();
-    exit(0);
+    this->stop_ = true;
   }
 }
 
@@ -112,12 +129,12 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
     filenameSystemData += ".csv";
 
     this->dataCollector_ = std::make_shared<DataCollector>(filename);
-    dataCollector_->WriteLine("fps, response_t");
+    this->dataCollector_->WriteLine("fps, response_t");
 
-    systemDataCollector = std::make_shared<SystemDataCollector>(
+    this->systemDataCollector = std::make_shared<SystemDataCollector>(
       filenameSystemData,
       this->get_clock());
-    timer_ = this->create_wall_timer(
+    this->timer_ = this->create_wall_timer(
       1s,
       std::bind(&SubscriberImageTransport::checkSubscribers, this));
     this->start = std::chrono::high_resolution_clock::now();
@@ -160,6 +177,9 @@ void SubscriberImageTransport::Initialize()
   } else if (this->compress_type_ == "png")
   {
     param_name = "camera.image.compressed.png_level";
+  } else if (this->compress_type_ == "zstd")
+  {
+    param_name = "camera.image.zstd.zstd_level";
   }
 
   for (

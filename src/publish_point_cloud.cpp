@@ -38,27 +38,64 @@ int main(int argc, char * argv[])
     std::cout << "Usage publish_point_cloud <filename> " << std::endl;
     return -1;
   }
-  std::string filename = argv[1];
-
   std::shared_ptr<performance_transport::PublisherPointCloudTransport> ppc =
-    std::make_shared<performance_transport::PublisherPointCloudTransport>(options, filename);
+    std::make_shared<performance_transport::PublisherPointCloudTransport>(
+      options);
+
+  ppc->declare_parameter("filename", "");
+  std::string filename;
+  ppc->get_parameter("filename", filename);
+  ppc->SetFilename(filename);
+
+  ppc->declare_parameter("compress", 0);
+  int compress = 0;
+  ppc->get_parameter("compress", compress);
+
+  ppc->declare_parameter("compress_type", "");
+  std::string compress_type{""};
+  ppc->get_parameter("compress_type", compress_type);
+  ppc->SetCompressType(compress_type);
+
+  ppc->declare_parameter("transport_hint", "raw");
+  std::string transport_hint{""};
+  ppc->get_parameter("transport_hint", transport_hint);
+  ppc->SetTransportHint(transport_hint);
+
   ppc->Initialize();
 
-  rclcpp::WallRate loop_rate(30);
+  ppc->declare_parameter("loop_time", 300);
+  int loop_time{300};
+  ppc->get_parameter("loop_time", loop_time);
+
+  ppc->SetCompress(compress);
 
   int size = ppc->GetSize();
 
-  performance_transport::SystemDataCollector systemDataCollector =
-    performance_transport::SystemDataCollector(
-    "publisher_point_cloud_data_cpu_mem" + std::string("_") +
-    std::to_string(size) + ".csv",
-    ppc->get_clock());
+  std::string filenameStats = "publisher_point_cloud_data" + std::string("_") +
+    std::to_string(size) + std::string("_") + transport_hint;
+
+  std::string filenameSystemData = "publisher_point_cloud_data_cpu_mem" + std::string("_") +
+    std::to_string(size) + std::string("_") + transport_hint;
+
+  if (transport_hint != "raw")
+  {
+    filenameStats += std::string("_") + std::to_string(compress);
+
+    filenameSystemData += std::string("_") + std::to_string(compress);
+  }
+
+  filenameStats += ".csv";
+  filenameSystemData += ".csv";
+
+  rclcpp::WallRate loop_rate(30);
+
+  std::shared_ptr<performance_transport::SystemDataCollector> systemDataCollector =
+    std::make_shared<performance_transport::SystemDataCollector>();
+      // filenameSystemData,
+      // ppc->get_clock());
 
   performance_transport::DataCollector dataCollector(
-    "publisher_point_cloud_data" + std::string("_") +
-    std::to_string(size) + ".csv");
-
-  int loop_time = 20;  // seconds
+    filenameStats);
 
   auto start_loop = std::chrono::high_resolution_clock::now();
   auto start = std::chrono::high_resolution_clock::now();
@@ -66,11 +103,11 @@ int main(int argc, char * argv[])
   while (rclcpp::ok()) {
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed = finish - start;
+
     if (elapsed.count() > 1) {
       double fps = static_cast<double>(ppc->GetNumberOfImagesPublished()) /
         static_cast<double>(elapsed.count());
-      dataCollector.WriteLine(
-        std::to_string(fps));
+      dataCollector.WriteLine(std::to_string(fps));
       start = finish;
     }
 
@@ -78,24 +115,20 @@ int main(int argc, char * argv[])
     elapsed = finish - start_loop;
 
     if (elapsed.count() > loop_time) {
-      // break;
+      break;
     }
 
     loop_rate.sleep();
     rclcpp::spin_some(ppc);
   }
 
-  std::cout << "exit loop" << std::endl;
-
-  systemDataCollector.Close();
+  systemDataCollector->Close();
+  // systemDataCollector.reset();
   dataCollector.Close();
-  std::cout << "exit loop2" << std::endl;
 
-  ppc.reset();
-  std::cout << "exit loop3" << std::endl;
+  ppc->Destroy();
 
   rclcpp::shutdown();
-  std::cout << "exit loop4" << std::endl;
 
   return 0;
 }

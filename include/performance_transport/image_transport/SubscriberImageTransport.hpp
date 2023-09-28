@@ -42,6 +42,9 @@ public:
 
   void SetTransportHint(const std::string & _transport_hint);
   void SetCompressType(const std::string & _compress_type);
+  bool IsFinished();
+  void Destroy();
+
 private:
   void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
 
@@ -62,6 +65,8 @@ private:
 
   double diff_time_sim_{0};
   double last_update{0};
+
+  std::atomic<bool> stop_{false};
 };
 }  // namespace performance_transport
 

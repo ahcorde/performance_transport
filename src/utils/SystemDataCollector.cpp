@@ -26,7 +26,6 @@ SystemDataCollector::SystemDataCollector(
   const std::string & _filename, rclcpp::Clock::SharedPtr _clock)
 : filename_(_filename), clock_(_clock)
 {
-  this->outputfile_.open(this->filename_);
   thread = std::thread(std::bind(&SystemDataCollector::loop, this));
 }
 
@@ -65,8 +64,8 @@ SystemDataCollector::~SystemDataCollector()
 void SystemDataCollector::Close()
 {
   this->stop_ = true;
-  thread.join();
-  this->outputfile_.close();
+  if (thread.joinable())
+    thread.join();
 }
 
 }  // namespace performance_transport

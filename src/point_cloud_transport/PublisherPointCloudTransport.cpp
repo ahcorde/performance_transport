@@ -30,10 +30,8 @@ using namespace std::chrono_literals;
 namespace performance_transport
 {
 PublisherPointCloudTransport::PublisherPointCloudTransport(
-  const rclcpp::NodeOptions & _options,
-  const std::string & _filename)
-: Node("publisher_point_cloud_transport", _options),
-  filename_(_filename)
+  const rclcpp::NodeOptions & _options)
+: Node("publisher_point_cloud_transport", _options)
 {
   this->timer_ = this->create_wall_timer(
     33ms,
@@ -42,7 +40,32 @@ PublisherPointCloudTransport::PublisherPointCloudTransport(
 
 PublisherPointCloudTransport::~PublisherPointCloudTransport()
 {
+  this->Destroy();
+}
+
+void PublisherPointCloudTransport::Destroy()
+{
+  this->pub_.shutdown();
+  this->pc_.reset();
   this->timer_->cancel();
+}
+
+void PublisherPointCloudTransport::SetFilename(
+  const std::string & _filename)
+{
+  this->filename_ = _filename;
+}
+
+void PublisherPointCloudTransport::SetCompressType(
+  const std::string & _compress_type)
+{
+  this->compress_type_ = _compress_type;
+}
+
+void PublisherPointCloudTransport::SetCompress(int _value)
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  this->compress_ = _value;
 }
 
 int PublisherPointCloudTransport::GetSize()
@@ -64,7 +87,33 @@ void PublisherPointCloudTransport::PublishMessage()
   this->cloud_msg_.header.stamp = this->now();
   this->cloud_msg_.header.frame_id = "camera_link";
   this->pub_.publish(this->cloud_msg_);
+  if (this->count_ == 0)
+  {
+    this->SetCompressParameter();
+  }
   this->count_++;
+}
+
+void PublisherPointCloudTransport::SetTransportHint(
+  const std::string & _transport_hint)
+{
+  this->transport_hint_ = _transport_hint;
+}
+
+void PublisherPointCloudTransport::SetCompressParameter()
+{
+  std::cout << "SetCompressParameter " << this->transport_hint_ << " value: " << this->compress_ << std::endl;
+
+  if (this->transport_hint_ == "draco")
+  {
+    this->set_parameter(rclcpp::Parameter("encode_speed", this->compress_));
+  } else if (this->transport_hint_ == "zlib")
+  {
+    this->set_parameter(rclcpp::Parameter("encode_level", this->compress_));
+  } else if (this->transport_hint_ == "zstd")
+  {
+    this->set_parameter(rclcpp::Parameter("zstd_encode_level", this->compress_));
+  }
 }
 
 void PublisherPointCloudTransport::Initialize()

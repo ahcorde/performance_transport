@@ -35,10 +35,13 @@ class SubscriberPointCloudTransport : public rclcpp::Node
 {
 public:
   SubscriberPointCloudTransport(
-    const rclcpp::NodeOptions & _options,
-    const std::string & _transport_hint);
+    const rclcpp::NodeOptions & _options);
   ~SubscriberPointCloudTransport();
+  void SetTransportHint(const std::string & _transport_hint);
   void Initialize();
+  void checkSubscribers();
+  void Destroy();
+  bool IsFinished();
 
 private:
   void pointCloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr & msg);
@@ -49,9 +52,15 @@ private:
   std::shared_ptr<DataCollector> dataCollector_;
   std::chrono::time_point<std::chrono::system_clock> start;
   std::shared_ptr<SystemDataCollector> systemDataCollector;
+  rclcpp::TimerBase::SharedPtr timer_;
 
   double diff_time_sim_{0};
   int count_{0};
+
+  std::atomic<bool> stop_{false};
+
+  double last_update{0};
+  int compress_{0};
 };
 }  // namespace performance_transport
 

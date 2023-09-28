@@ -30,13 +30,18 @@ class PublisherPointCloudTransport : public rclcpp::Node
 {
 public:
   PublisherPointCloudTransport(
-    const rclcpp::NodeOptions & _options,
-    const std::string & _filename);
+    const rclcpp::NodeOptions & _options);
   ~PublisherPointCloudTransport();
   void Initialize();
+  void SetFilename(const std::string & _filename);
+  void SetCompressType(const std::string & _compress_type);
+  void SetCompress(int _value);
+  void SetCompressParameter();
+  void SetTransportHint(const std::string & _transport_hint);
   void PublishMessage();
   int GetSize();
   int GetNumberOfImagesPublished();
+  void Destroy();
 
 private:
   std::shared_ptr<point_cloud_transport::PointCloudTransport> pc_;
@@ -46,6 +51,9 @@ private:
   std::string filename_;
   std::mutex mutex_;
   int count_{0};
+  int compress_{0};
+  std::string compress_type_;
+  std::string transport_hint_;
 };
 }  // namespace performance_transport
 

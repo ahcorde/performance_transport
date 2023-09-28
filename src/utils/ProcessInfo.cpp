@@ -114,9 +114,6 @@ void ProcessInfo::GetNetworkStats()
       rpackets = static_cast<int>(r_packets - r_packets_prev);
       tpackets = static_cast<int>(t_packets - t_packets_prev);
 
-      std::cout << "rbytes " << rbytes << " tbytes " << tbytes << std::endl;
-      std::cout << "rpackets " << rpackets << " t_packets " << tpackets << std::endl;
-
       r_bytes_prev = r_bytes;
       t_bytes_prev = t_bytes;
       r_packets_prev = r_packets;
