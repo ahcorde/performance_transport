@@ -21,7 +21,7 @@ int main(int argc, char ** argv)
   rclcpp::NodeOptions options;
   std::shared_ptr<performance_transport::SubscriberPointCloudTransport> node =
     std::make_shared<performance_transport::SubscriberPointCloudTransport>(
-      options);
+    options);
 
   node->declare_parameter("transport_hint", "raw");
   std::string transport_hint{""};
@@ -32,8 +32,7 @@ int main(int argc, char ** argv)
 
   rclcpp::WallRate loop_rate(30);
 
-  while(rclcpp::ok() && !node->IsFinished())
-  {
+  while (rclcpp::ok() && !node->IsFinished()) {
     rclcpp::spin_some(node);
     loop_rate.sleep();
   }

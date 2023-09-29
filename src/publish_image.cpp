@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
 
   std::shared_ptr<performance_transport::PublisherImageTransport> pit =
     std::make_shared<performance_transport::PublisherImageTransport>(
-      options);
+    options);
 
   pit->declare_parameter("filename", "");
   std::string filename;
@@ -90,12 +90,16 @@ int main(int argc, char ** argv)
     std::to_string(size) + std::string("_") +
     transport_hint;
 
-  if (transport_hint == "compressed")
-  {
+  if (transport_hint == "compressed") {
     filenameStats += std::string("_") + compress_type;
     filenameStats += std::string("_") + std::to_string(compress);
 
     filenameSystemData += std::string("_") + compress_type;
+    filenameSystemData += std::string("_") + std::to_string(compress);
+  }
+
+  if (transport_hint == "zstd") {
+    filenameStats += std::string("_") + std::to_string(compress);
     filenameSystemData += std::string("_") + std::to_string(compress);
   }
 

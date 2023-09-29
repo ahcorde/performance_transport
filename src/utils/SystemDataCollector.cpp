@@ -32,8 +32,9 @@ SystemDataCollector::SystemDataCollector(
 void SystemDataCollector::loop()
 {
   performance_transport::DataCollector dataCollector(this->filename_);
-  dataCollector.WriteLine("timestamp, uptime, cpuusage, memory, anonmemory, vm, "
-                          "rmbytes, tmbytes, rpackets, tpackets");
+  dataCollector.WriteLine(
+    "timestamp, uptime, cpuusage, memory, anonmemory, vm, "
+    "rmbytes, tmbytes, rpackets, tpackets");
   rclcpp::WallRate loop_rate(1);
   ProcessInfo pinfo(getpid());
 
@@ -64,8 +65,9 @@ SystemDataCollector::~SystemDataCollector()
 void SystemDataCollector::Close()
 {
   this->stop_ = true;
-  if (thread.joinable())
+  if (thread.joinable()) {
     thread.join();
+  }
 }
 
 }  // namespace performance_transport

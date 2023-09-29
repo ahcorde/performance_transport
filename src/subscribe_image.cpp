@@ -39,8 +39,7 @@ int main(int argc, char ** argv)
 
   rclcpp::WallRate loop_rate(30);
 
-  while(rclcpp::ok() && !node->IsFinished())
-  {
+  while (rclcpp::ok() && !node->IsFinished()) {
     rclcpp::spin_some(node);
     loop_rate.sleep();
   }

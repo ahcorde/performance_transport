@@ -40,7 +40,7 @@ int main(int argc, char * argv[])
   }
   std::shared_ptr<performance_transport::PublisherPointCloudTransport> ppc =
     std::make_shared<performance_transport::PublisherPointCloudTransport>(
-      options);
+    options);
 
   ppc->declare_parameter("filename", "");
   std::string filename;
@@ -77,8 +77,7 @@ int main(int argc, char * argv[])
   std::string filenameSystemData = "publisher_point_cloud_data_cpu_mem" + std::string("_") +
     std::to_string(size) + std::string("_") + transport_hint;
 
-  if (transport_hint != "raw")
-  {
+  if (transport_hint != "raw") {
     filenameStats += std::string("_") + std::to_string(compress);
 
     filenameSystemData += std::string("_") + std::to_string(compress);
@@ -91,8 +90,8 @@ int main(int argc, char * argv[])
 
   std::shared_ptr<performance_transport::SystemDataCollector> systemDataCollector =
     std::make_shared<performance_transport::SystemDataCollector>();
-      // filenameSystemData,
-      // ppc->get_clock());
+  // filenameSystemData,
+  // ppc->get_clock());
 
   performance_transport::DataCollector dataCollector(
     filenameStats);

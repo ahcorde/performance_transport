@@ -90,8 +90,7 @@ void PublisherImageTransport::PublishMessage()
   std::lock_guard<std::mutex> lock(mutex_);
   this->msg_->header.stamp = this->now();
   this->pub.publish(this->msg_);
-  if (this->count == 0)
-  {
+  if (this->count == 0) {
     SetCompressJpegParameter();
     SetCompressType();
   }
@@ -121,22 +120,18 @@ void PublisherImageTransport::SetCompressJpeg(int _value)
 
 void PublisherImageTransport::SetCompressJpegParameter()
 {
-  if (this->compress_type_ == "jpeg")
-  {
+  if (this->compress_type_ == "jpeg") {
     this->set_parameter(rclcpp::Parameter("camera.image.compressed.jpeg_quality", this->compress_));
-  } else if (this->compress_type_ == "png")
-  {
+  } else if (this->compress_type_ == "png") {
     this->set_parameter(rclcpp::Parameter("camera.image.compressed.png_level", this->compress_));
-  } else if (this->compress_type_ == "zstd")
-  {
+  } else if (this->compress_type_ == "zstd") {
     this->set_parameter(rclcpp::Parameter("camera.image.zstd.zstd_level", this->compress_));
   }
 }
 
 void PublisherImageTransport::SetCompressType()
 {
-  if (this->compress_type_ == "jpeg" || this->compress_type_ == "png")
-  {
+  if (this->compress_type_ == "jpeg" || this->compress_type_ == "png") {
     this->set_parameter(rclcpp::Parameter("camera.image.compressed.format", this->compress_type_));
   }
 }

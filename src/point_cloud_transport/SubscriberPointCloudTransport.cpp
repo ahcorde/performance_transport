@@ -66,8 +66,7 @@ void SubscriberPointCloudTransport::checkSubscribers()
   auto current_time_stamp_seconds = timeToSec(this->now());
   auto diff = current_time_stamp_seconds - this->last_update;
 
-  if (diff > 1)
-  {
+  if (diff > 1) {
     this->stop_ = true;
   }
 }
@@ -87,8 +86,7 @@ void SubscriberPointCloudTransport::pointCloudCallback(
       std::to_string(size) + std::string("_") +
       this->transport_hint_;
 
-    if (this->transport_hint_ != "raw")
-    {
+    if (this->transport_hint_ != "raw") {
       filename += std::string("_") + std::to_string(this->compress_);
 
       filenameSystemData += std::string("_") + std::to_string(this->compress_);
@@ -133,7 +131,7 @@ void SubscriberPointCloudTransport::pointCloudCallback(
 
 void SubscriberPointCloudTransport::Initialize()
 {
-auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(
+  auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(
     this, "publisher_point_cloud_transport");
   while (!parameters_client->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
@@ -146,14 +144,11 @@ auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(
   std::stringstream ss;
 
   std::string param_name;
-  if (this->transport_hint_ == "draco")
-  {
+  if (this->transport_hint_ == "draco") {
     param_name = "encode_speed";
-  } else if (this->transport_hint_ == "zlib")
-  {
+  } else if (this->transport_hint_ == "zlib") {
     param_name = "encode_level";
-  } else if (this->transport_hint_ == "zstd")
-  {
+  } else if (this->transport_hint_ == "zstd") {
     param_name = "zstd_encode_level";
   }
 

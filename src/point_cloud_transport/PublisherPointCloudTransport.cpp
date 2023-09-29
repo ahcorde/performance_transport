@@ -87,8 +87,7 @@ void PublisherPointCloudTransport::PublishMessage()
   this->cloud_msg_.header.stamp = this->now();
   this->cloud_msg_.header.frame_id = "camera_link";
   this->pub_.publish(this->cloud_msg_);
-  if (this->count_ == 0)
-  {
+  if (this->count_ == 0) {
     this->SetCompressParameter();
   }
   this->count_++;
@@ -102,16 +101,14 @@ void PublisherPointCloudTransport::SetTransportHint(
 
 void PublisherPointCloudTransport::SetCompressParameter()
 {
-  std::cout << "SetCompressParameter " << this->transport_hint_ << " value: " << this->compress_ << std::endl;
+  std::cout << "SetCompressParameter " << this->transport_hint_ << " value: " << this->compress_ <<
+    std::endl;
 
-  if (this->transport_hint_ == "draco")
-  {
+  if (this->transport_hint_ == "draco") {
     this->set_parameter(rclcpp::Parameter("encode_speed", this->compress_));
-  } else if (this->transport_hint_ == "zlib")
-  {
+  } else if (this->transport_hint_ == "zlib") {
     this->set_parameter(rclcpp::Parameter("encode_level", this->compress_));
-  } else if (this->transport_hint_ == "zstd")
-  {
+  } else if (this->transport_hint_ == "zstd") {
     this->set_parameter(rclcpp::Parameter("zstd_encode_level", this->compress_));
   }
 }
