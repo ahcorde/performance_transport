@@ -39,20 +39,34 @@ def generate_test_description():
     publish_image_node = Node(
         package='performance_transport',
         executable='publish_point_cloud',
-        parameters=[{'pct.point_cloud.enable_pub_plugins':
+        parameters=[{'filename' : [image_path, '/', LaunchConfiguration('filename')],
+                     'compress': LaunchConfiguration('compress'),
+                     'compress_type': LaunchConfiguration('compress_type'),
+                     'transport_hint': LaunchConfiguration('transport_type'),
+                     'loop_time': LaunchConfiguration('loop_time'),
+                     'pct.point_cloud.enable_pub_plugins':
                      [['point_cloud_transport/', LaunchConfiguration('transport_type')]]}],
-        arguments=[ [image_path, '/', LaunchConfiguration('pcd_name')]],
         output='screen')
 
     subscriber_image_node = Node(
         package='performance_transport',
         executable='subscribe_point_cloud',
-        arguments=[LaunchConfiguration('transport_type')],
+        parameters=[{'transport_hint': LaunchConfiguration('transport_type')}],
         output='screen')
 
     return launch.LaunchDescription([
         DeclareLaunchArgument(
-            'pcd_name',
+            'compress_type',
+            default_value=[''],
+            description='Compress type',
+        ),
+        DeclareLaunchArgument(
+            'compress',
+            default_value=['2'],
+            description='Compress value',
+        ),
+        DeclareLaunchArgument(
+            'filename',
             default_value=['table_scene_lms400.pcd'],
             description='PCD file name',
         ),
@@ -60,6 +74,11 @@ def generate_test_description():
             'transport_type',
             default_value=['draco'],
             description='Transport type',
+        ),
+        DeclareLaunchArgument(
+            'loop_time',
+            default_value=['300'],
+            description='Loop time',
         ),
         subscriber_image_node,
         publish_image_node,

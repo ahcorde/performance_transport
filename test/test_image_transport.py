@@ -45,6 +45,7 @@ def generate_test_description():
                      'size': LaunchConfiguration('size'),
                      'compress': LaunchConfiguration('compress'),
                      'compress_type': LaunchConfiguration('compress_type'),
+                     'loop_time': LaunchConfiguration('loop_time'),
                      'transport_hint': LaunchConfiguration('transport_type'),
                      'camera.image.enable_pub_plugins':[['image_transport/', LaunchConfiguration('transport_type')]]
                      }],
@@ -78,6 +79,11 @@ def generate_test_description():
             'transport_type',
             default_value=[''],
             description='Transport type',
+        ),
+        DeclareLaunchArgument(
+            'loop_time',
+            default_value=['300'],
+            description='Loop time',
         ),
         subscriber_image_node,
         publish_image_node,
