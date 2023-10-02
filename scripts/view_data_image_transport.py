@@ -7,7 +7,7 @@ import matplotlib.animation as animation
 
 import pandas as pd
 
-folder_name = '/home/ahcorde/TRI/performance_transport_ws/build/performance_transport/test/'
+folder_name = '/home/ahcorde/Downloads/transport_data/'
 
 transport_hint = ['raw', 'compressed']
 compressed_types = ['jpeg', 'png', 'zstd']

@@ -86,8 +86,7 @@ void SubscriberImageTransport::checkSubscribers()
   auto current_time_stamp_seconds = timeToSec(this->now());
   auto diff = current_time_stamp_seconds - this->last_update;
 
-  if (diff > 1)
-  {
+  if (diff > 1) {
     this->stop_ = true;
   }
 }
@@ -117,8 +116,7 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
       std::to_string(size_) + std::string("_") +
       this->transport_hint_;
 
-    if (this->transport_hint_ == "compressed")
-    {
+    if (this->transport_hint_ == "compressed") {
       filename += std::string("_") + this->compress_type_;
       filename += std::string("_") + std::to_string(this->compress_);
 
@@ -159,7 +157,9 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
 
 void SubscriberImageTransport::Initialize()
 {
-  auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(this, "publisher_image_transport");
+  auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(
+    this,
+    "publisher_image_transport");
   while (!parameters_client->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
       RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
@@ -171,14 +171,11 @@ void SubscriberImageTransport::Initialize()
   std::stringstream ss;
 
   std::string param_name;
-  if (this->compress_type_ == "jpeg")
-  {
+  if (this->compress_type_ == "jpeg") {
     param_name = "camera.image.compressed.jpeg_quality";
-  } else if (this->compress_type_ == "png")
-  {
+  } else if (this->compress_type_ == "png") {
     param_name = "camera.image.compressed.png_level";
-  } else if (this->compress_type_ == "zstd")
-  {
+  } else if (this->compress_type_ == "zstd") {
     param_name = "camera.image.zstd.zstd_level";
   }
 

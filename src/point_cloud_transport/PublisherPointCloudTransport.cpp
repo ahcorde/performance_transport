@@ -87,8 +87,7 @@ void PublisherPointCloudTransport::PublishMessage()
   this->cloud_msg_.header.stamp = this->now();
   this->cloud_msg_.header.frame_id = "camera_link";
   this->pub_.publish(this->cloud_msg_);
-  if (this->count_ == 0)
-  {
+  if (this->count_ == 0) {
     this->SetCompressParameter();
   }
   this->count_++;
@@ -109,8 +108,7 @@ void PublisherPointCloudTransport::SetCompressParameter()
   } else if (this->transport_hint_ == "zlib")
   {
     this->set_parameter(rclcpp::Parameter("encode_level", this->compress_));
-  } else if (this->transport_hint_ == "zstd")
-  {
+  } else if (this->transport_hint_ == "zstd") {
     this->set_parameter(rclcpp::Parameter("zstd_encode_level", this->compress_));
   }
 }
