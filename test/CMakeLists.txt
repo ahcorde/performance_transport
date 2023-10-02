@@ -29,7 +29,7 @@ SET(COMPRESS_VALUES 3 6 9)
 SET(COMPRESS_TYPE zstd)
 foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
     foreach(SIZE IN LISTS SIZES)
-    message("Created test: " test_image_transport_${SIZE}_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    message("Created test: " test_image_transport_${SIZE}_${COMPRESS_TYPE}_${COMPRESS_VALUE})
         add_launch_test(test_image_transport.py
             TARGET test_image_transport_${SIZE}_${COMPRESS_TYPE}_${COMPRESS_VALUE}
             ARGS "size:=${SIZE}" "transport_type:=zstd" "compress_type:=${COMPRESS_TYPE}" "compress:=${COMPRESS_VALUE}"

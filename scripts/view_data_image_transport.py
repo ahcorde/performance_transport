@@ -7,14 +7,17 @@ import matplotlib.animation as animation
 
 import pandas as pd
 
-folder_name = '/home/ahcorde/Downloads/transport_data/'
+folder_name = '/home/ahcorde/TRI/performance_transport_ws/build/performance_transport/test'
 
-transport_hint = ['raw', 'compressed']
-compressed_types = ['jpeg', 'png', 'zstd']
-jpeg_compress = ['90', '70', '40', '30', '10']
-png_compress = ['1', '3', '5', '7', '9']
-zstd_compress = ['1', '3', '5', '7', '9']
+transport_hint = ['raw', 'compressed', 'zstd']
+compressed_types = ['jpeg', 'png']
+jpeg_compress = ['90', '50', '20']
+png_compress = ['3', '6', '9']
+zstd_compress = ['3', '6', '9']
 image_sizes = ['4096', '2048', '1024', '512']
+
+raw_cpu_mem = {}
+raw = {}
 
 jpeg_90_cpu_mem = {}
 jpeg_90 = {}
@@ -25,101 +28,136 @@ png_90 = {}
 zstd_90_cpu_mem = {}
 zstd_90 = {}
 
-subscriber_data_cpu_mem = os.path.join(folder_name, 'subscriber_data_cpu_mem')
-subscriber_data = os.path.join(folder_name, 'subscriber_data')
+color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
+linetype =['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']
 
-for transport in transport_hint:
-    for size in image_sizes:
-        name = '_' + str(size) + '_' + str(size) + '_' + transport
-        if transport == 'compressed':
-            for compress_type in compressed_types:
-                if compress_type == 'jpeg':
-                    for compress in jpeg_compress:
-                        name2 = name + '_' + compress_type + '_' + compress + '.csv'
-                        if compress == '90':
-                            jpeg_90_cpu_mem[subscriber_data_cpu_mem + name2] = {'size' : size}
-                            jpeg_90[subscriber_data + name2] = {'size' : size}
-                        # print(subscriber_data_cpu_mem + name2)
-                if compress_type == 'png':
-                    for compress in png_compress:
-                        name2 = name + '_' + compress_type + '_' + compress + '.csv'
-                        if compress == '9':
-                            png_90_cpu_mem[subscriber_data_cpu_mem + name2] = {'size' : size}
-                            png_90[subscriber_data + name2] = {'size' : size}
-                            print(subscriber_data + name2)
-                if compress_type == 'zstd':
-                    for compress in png_compress:
-                        name2 = name + '_' + compress_type + '_' + compress + '.csv'
-                        if compress == '9':
-                            zstd_90_cpu_mem[subscriber_data_cpu_mem + name2] = {'size' : size}
-                            zstd_90[subscriber_data + name2] = {'size' : size}
-                            print(subscriber_data + name2)
-# print(jpeg_90)
-# print(png_90)
+color_index = 0
+linetype_index = 0
 
-# columns = ['timestamp', 'uptime', 'cpuusage', 'memory', 'anonmemory', 'vm', 'rmbytes', 'tmbytes', 'rpackets', 'tpackets']
+for type_node in ['publisher']:
+    data_cpu_mem_str = os.path.join(folder_name, type_node + '_data_cpu_mem')
+    data_str = os.path.join(folder_name, type_node + '_data')
 
-# for column in columns:
-#     if column == 'timestamp':
-#         continue
-#     fig, ax = plt.subplots()
-#     for compress_90, value in jpeg_90_cpu_mem.items():
-#         df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
-#         df['timestamp'] = df['timestamp'] - df['timestamp'][0]
-#         ax.plot(df['timestamp'].values, df[column].values, label=f"{column} {value['size']}x{value['size']}")
-#         ax.set_title(column)
-#         ax.set_ylabel(column)
-#         ax.set_xlabel('Time [s]')
-#         ax.legend()
+    for transport in transport_hint:
+        for size in image_sizes:
+            name = '_' + str(size) + '_' + str(size) + '_' + transport
+            if transport == 'raw':
+                raw_cpu_mem[data_cpu_mem_str + name + '.csv'] = {'size' : size}
+                raw[data_str + name + '.csv'] = {'size' : size}
+            elif transport == 'compressed':
+                for compress_type in compressed_types:
+                    if compress_type == 'jpeg':
+                        for compress in jpeg_compress:
+                            name2 = name + '_' + compress_type + '_' + compress + '.csv'
+                            if compress == '90':
+                                jpeg_90_cpu_mem[data_cpu_mem_str + name2] = {'size' : size}
+                                jpeg_90[data_str + name2] = {'size' : size}
+                            # print(data_cpu_mem_str + name2)
+                    if compress_type == 'png':
+                        for compress in png_compress:
+                            name2 = name + '_' + compress_type + '_' + compress + '.csv'
+                            if compress == '9':
+                                png_90_cpu_mem[data_cpu_mem_str + name2] = {'size' : size}
+                                png_90[data_str + name2] = {'size' : size}
+                                # print(data_str + name2)
+            elif transport == 'zstd':
+                for compress in png_compress:
+                    name2 = name + '_' + compress + '.csv'
+                    if compress == '9':
+                        zstd_90_cpu_mem[data_cpu_mem_str + name2] = {'size' : size}
+                        zstd_90[data_str + name2] = {'size' : size}
+                        # print(data_str + name2)
 
-columns = ['fps', 'response_t']
+    columns = ['timestamp', 'uptime', 'cpuusage', 'memory', 'anonmemory', 'vm', 'rmbytes', 'tmbytes', 'rpackets', 'tpackets']
 
-for column in columns:
-    if column == 'timestamp':
-        continue
-    fig, ax = plt.subplots()
-    for compress_90, value in jpeg_90.items():
-        print(compress_90)
-        df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
-        x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
-        ax.plot(x, df[column].values, label=f"JPEG {column} {value['size']}x{value['size']}")
-    for compress_90, value in png_90.items():
-        print(compress_90)
-        df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
-        x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
-        ax.plot(x, df[column].values, label=f"PNG {column} {value['size']}x{value['size']}")
-    for compress_90, value in zstd_90.items():
-        print(compress_90)
-        df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
-        x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
-        ax.plot(x, df[column].values, label=f"ZSTD {column} {value['size']}x{value['size']}")
-    ax.set_title(column)
-    ax.set_ylabel(column)
-    ax.set_xlabel('Time [s]')
-    ax.legend()
+    for column in columns:
+        if column == 'timestamp' or column == 'uptime':
+            continue
+        fig, ax = plt.subplots()
+
+        color_index = 0
+        linetype_index = 0
+
+        for compress_90, value in raw_cpu_mem.items():
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+            ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"RAW {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+        color_index = color_index + 1
+        for compress_90, value in jpeg_90_cpu_mem.items():
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+            ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"JPEG {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+
+        color_index = color_index + 1
+        for compress_90, value in png_90_cpu_mem.items():
+            print(compress_90)
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+            print(linetype[linetype_index])
+            print('color_index ', color_index)
+            print(color[color_index])
+            ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"PNG {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+
+        color_index = color_index + 1
+        for compress_90, value in zstd_90_cpu_mem.items():
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+            ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"ZSTD {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
 
 
-# columns = ['translation.x', 'translation.y', 'translation.z', 'rotation.x', 'rotation.y', 'rotation.z', 'rotation.w']
-# df = pd.read_csv('data_ground_truth.csv', names=columns, delimiter=',', header=None)
-# df_slam = pd.read_csv('slam.csv', names=columns, delimiter=',', header=None)
+        ax.set_title(column)
+        ax.set_ylabel(column)
+        ax.set_xlabel('Time [s]')
+        ax.legend()
 
-# scat = ax.scatter(df_slam['translation.x'][0], df_slam['translation.x'][1], c='b', s=5,  label='slam')
-# line2 = ax.plot(df['translation.x'][0], df['translation.x'][1], label=f'ground_truth')[0]
+    if type_node == 'publisher':
+        columns = ['fps']
+    else:
+        columns = ['fps', 'response_t']
 
-# ax.set(xlim=[0, 20], ylim=[-5, 5], xlabel='X [m]', ylabel='Y [m]')
-# ax.legend()
+    for column in columns:
+        if column == 'timestamp':
+            continue
 
-# def update(frame):
-#     # for each frame, update the data stored on each artist.
-#     x = df_slam['translation.x'][:frame]
-#     y = df_slam['translation.y'][:frame]
-#     # update the scatter plot:
-#     data = np.stack([x, y]).T
-#     scat.set_offsets(data)
-#     # update the line plot:
-#     line2.set_xdata(df['translation.x'][:frame])
-#     line2.set_ydata(df['translation.y'][:frame])
-#     return (scat, line2)
+        color_index = 0
+        linetype_index = 0
 
-# ani = animation.FuncAnimation(fig=fig, func=update, frames=504, interval=30)
+        fig, ax = plt.subplots()
+        for raw_file, value in raw.items():
+            print(raw_file)
+            df = pd.read_csv(raw_file, delimiter=',', names=columns, header=0, skiprows=0)
+            x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
+            ax.plot(x, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"RAW {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+
+        color_index = color_index + 1
+        for compress_90, value in jpeg_90.items():
+            print(compress_90)
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
+            ax.plot(x, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"JPEG {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+        color_index = color_index + 1
+        for compress_90, value in png_90.items():
+            print(compress_90)
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
+            ax.plot(x, df[column].values, linestyle=linetype[linetype_index], color=color[color_index], label=f"PNG {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+        color_index = color_index + 1
+        for compress_90, value in zstd_90.items():
+            print(compress_90)
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
+            ax.plot(x, df[column].values, linestyle=linetype[linetype_index],color=color[color_index], label=f"ZSTD {column} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+        ax.set_title(column)
+        ax.set_ylabel(column)
+        ax.set_xlabel('Time [s]')
+        ax.set_title(f'{type_node} {column}')
+        ax.legend()
 plt.show()

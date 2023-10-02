@@ -66,7 +66,7 @@ void SubscriberPointCloudTransport::checkSubscribers()
   auto current_time_stamp_seconds = timeToSec(this->now());
   auto diff = current_time_stamp_seconds - this->last_update;
 
-  if (diff > 1) {
+  if (diff > 5) {
     this->stop_ = true;
   }
 }
@@ -97,8 +97,7 @@ void SubscriberPointCloudTransport::pointCloudCallback(
     this->systemDataCollector = std::make_shared<SystemDataCollector>(
       filenameSystemData,
       this->get_clock());
-    this->dataCollector_ = std::make_shared<DataCollector>(
-      filename);
+    this->dataCollector_ = std::make_shared<DataCollector>(filename);
     this->timer_ = this->create_wall_timer(
       1s,
       std::bind(&SubscriberPointCloudTransport::checkSubscribers, this));
