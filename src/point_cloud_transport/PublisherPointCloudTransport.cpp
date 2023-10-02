@@ -102,11 +102,10 @@ void PublisherPointCloudTransport::SetTransportHint(
 
 void PublisherPointCloudTransport::SetCompressParameter()
 {
-  std::cout << "SetCompressParameter " << this->transport_hint_ << " value: " << this->compress_ << std::endl;
-
   if (this->transport_hint_ == "draco")
   {
     this->set_parameter(rclcpp::Parameter("encode_speed", this->compress_));
+    this->set_parameter(rclcpp::Parameter("decode_speed", this->compress_));
   } else if (this->transport_hint_ == "zlib")
   {
     this->set_parameter(rclcpp::Parameter("encode_level", this->compress_));

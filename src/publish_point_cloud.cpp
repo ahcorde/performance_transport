@@ -90,9 +90,9 @@ int main(int argc, char * argv[])
   rclcpp::WallRate loop_rate(30);
 
   std::shared_ptr<performance_transport::SystemDataCollector> systemDataCollector =
-    std::make_shared<performance_transport::SystemDataCollector>();
-      // filenameSystemData,
-      // ppc->get_clock());
+    std::make_shared<performance_transport::SystemDataCollector>(
+      filenameSystemData,
+      ppc->get_clock());
 
   performance_transport::DataCollector dataCollector(
     filenameStats);
