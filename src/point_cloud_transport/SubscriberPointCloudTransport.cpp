@@ -165,7 +165,7 @@ void SubscriberPointCloudTransport::Initialize()
   auto transport_hint = std::make_shared<point_cloud_transport::TransportHints>(
     this->transport_hint_);
   this->sub = this->pc->subscribe(
-    "pct/point_cloud", 100,
+    "pct/point_cloud", rmw_qos_profile_sensor_data,
     std::bind(&SubscriberPointCloudTransport::pointCloudCallback, this, _1),
     {}, transport_hint.get());
 }

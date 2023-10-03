@@ -117,7 +117,7 @@ void PublisherPointCloudTransport::Initialize()
 {
   this->pc_ =
     std::make_shared<point_cloud_transport::PointCloudTransport>(this->shared_from_this());
-  this->pub_ = this->pc_->advertise("pct/point_cloud", 10);
+  this->pub_ = this->pc_->advertise("pct/point_cloud", rmw_qos_profile_sensor_data);
   if (this->filename_ == "" || pcl::io::loadPCDFile(this->filename_, this->cloud_msg_) == -1) {
     RCLCPP_ERROR(this->get_logger(), "failed to open PCD file");
     throw std::runtime_error{"could not open PCD file"};
