@@ -103,13 +103,13 @@ void PublisherPointCloudTransport::SetCompressParameter()
 {
   if (this->transport_hint_ == "draco")
   {
-    this->set_parameter(rclcpp::Parameter("encode_speed", this->compress_));
-    this->set_parameter(rclcpp::Parameter("decode_speed", this->compress_));
+    this->set_parameter(rclcpp::Parameter("pct.point_cloud.draco.encode_speed", this->compress_));
+    this->set_parameter(rclcpp::Parameter("pct.point_cloud.draco.decode_speed", this->compress_));
   } else if (this->transport_hint_ == "zlib")
   {
-    this->set_parameter(rclcpp::Parameter("encode_level", this->compress_));
+    this->set_parameter(rclcpp::Parameter("pct.point_cloud.zlib.encode_level", this->compress_));
   } else if (this->transport_hint_ == "zstd") {
-    this->set_parameter(rclcpp::Parameter("zstd_encode_level", this->compress_));
+    this->set_parameter(rclcpp::Parameter("pct.point_cloud.zstd.zstd_encode_level", this->compress_));
   }
 }
 

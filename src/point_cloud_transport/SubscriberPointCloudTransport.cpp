@@ -144,11 +144,11 @@ void SubscriberPointCloudTransport::Initialize()
 
   std::string param_name;
   if (this->transport_hint_ == "draco") {
-    param_name = "encode_speed";
+    param_name = "pct.point_cloud.draco.encode_speed";
   } else if (this->transport_hint_ == "zlib") {
-    param_name = "encode_level";
+    param_name = "pct.point_cloud.zlib.encode_level";
   } else if (this->transport_hint_ == "zstd") {
-    param_name = "zstd_encode_level";
+    param_name = "pct.point_cloud.zstd.zstd_encode_level";
   }
 
   for (
