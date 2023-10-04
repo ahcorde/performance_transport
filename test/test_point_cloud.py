@@ -16,12 +16,12 @@
 import os
 import unittest
 
-import launch
 
 from ament_index_python.packages import get_package_share_directory
-from launch_ros.actions import Node
+import launch
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 import launch_testing
 
 import pytest
@@ -39,7 +39,7 @@ def generate_test_description():
     publish_image_node = Node(
         package='performance_transport',
         executable='publish_point_cloud',
-        parameters=[{'filename' : [image_path, '/', LaunchConfiguration('filename')],
+        parameters=[{'filename': [image_path, '/', LaunchConfiguration('filename')],
                      'compress': LaunchConfiguration('compress'),
                      'compress_type': LaunchConfiguration('compress_type'),
                      'transport_hint': LaunchConfiguration('transport_type'),

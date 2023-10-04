@@ -16,12 +16,11 @@
 import os
 import unittest
 
-import launch
-
 from ament_index_python.packages import get_package_share_directory
-from launch_ros.actions import Node
+import launch
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 import launch_testing
 
 import pytest
@@ -41,13 +40,14 @@ def generate_test_description():
     publish_image_node = Node(
         package='performance_transport',
         executable='publish_image',
-        parameters=[{'filename' : image_path,
+        parameters=[{'filename': image_path,
                      'size': LaunchConfiguration('size'),
                      'compress': LaunchConfiguration('compress'),
                      'compress_type': LaunchConfiguration('compress_type'),
                      'loop_time': LaunchConfiguration('loop_time'),
                      'transport_hint': LaunchConfiguration('transport_type'),
-                     'camera.image.enable_pub_plugins':[['image_transport/', LaunchConfiguration('transport_type')]]
+                     'camera.image.enable_pub_plugins': [['image_transport/',
+                                                          LaunchConfiguration('transport_type')]]
                      }],
         output='screen')
 
@@ -55,8 +55,7 @@ def generate_test_description():
         package='performance_transport',
         executable='subscribe_image',
         parameters=[{'compress_type': LaunchConfiguration('compress_type'),
-                     'transport_hint': LaunchConfiguration('transport_type')
-        }],
+                     'transport_hint': LaunchConfiguration('transport_type')}],
         output='screen')
 
     return launch.LaunchDescription([

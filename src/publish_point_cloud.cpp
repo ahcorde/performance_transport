@@ -90,8 +90,8 @@ int main(int argc, char * argv[])
 
   std::shared_ptr<performance_transport::SystemDataCollector> systemDataCollector =
     std::make_shared<performance_transport::SystemDataCollector>(
-      filenameSystemData,
-      ppc->get_clock());
+    filenameSystemData,
+    ppc->get_clock());
 
   performance_transport::DataCollector dataCollector(
     filenameStats);
@@ -122,7 +122,6 @@ int main(int argc, char * argv[])
   }
 
   systemDataCollector->Close();
-  // systemDataCollector.reset();
   dataCollector.Close();
 
   ppc->Destroy();

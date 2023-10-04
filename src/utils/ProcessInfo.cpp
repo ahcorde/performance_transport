@@ -13,10 +13,6 @@
 // limitations under the License.
 #include "performance_transport/utils/ProcessInfo.hpp"
 
-#include <algorithm>
-#include <iostream>
-#include <string>
-
 #include <sys/sysinfo.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,6 +20,11 @@
 #include <sys/times.h>
 #include <ctype.h>
 #include <unistd.h>
+
+#include <algorithm>
+#include <iostream>
+#include <string>
+
 #define LINEBUFFLEN 2048
 
 ProcessInfo::ProcessInfo(uint32_t iProcessId)
