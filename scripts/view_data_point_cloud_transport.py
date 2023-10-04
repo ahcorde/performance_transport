@@ -23,20 +23,19 @@ folder_name = '/home/ahcorde/TRI/performance_transport_ws/build/performance_tran
 
 transport_hint = ['raw', 'draco', 'zstd', 'zlib']
 compress_array = ['3', '6', '9']
-sizes = ['75260', '2762400', '1179084']
-
-data_cpu_mem = {}
-data = {}
+sizes = ['2762400', '75260', '1179084']
+sizes = ['1179084']
 
 color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 linetype = ['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']
 
-color_index = 0
-linetype_index = 0
 
 for type_node in ['publisher', 'subscriber']:
     data_cpu_mem_str = os.path.join(folder_name, type_node + '_point_cloud_data_cpu_mem')
     data_str = os.path.join(folder_name, type_node + '_point_cloud_data')
+
+    data_cpu_mem = {}
+    data = {}
 
     for transport in transport_hint:
         for size in sizes:
@@ -62,6 +61,31 @@ for type_node in ['publisher', 'subscriber']:
                                               'compress': compress}
                     print(data_str + name2)
 
+    columns = ['timestamp', 'uptime', 'cpuusage', 'memory', 'anonmemory',
+               'vm', 'rmbytes', 'tmbytes', 'rpackets', 'tpackets']
+
+    for size in sizes:
+        for column in columns:
+            if column == 'timestamp' or column == 'uptime':
+                continue
+            fig, ax = plt.subplots()
+
+            color_index = 0
+            linetype_index = 0
+            for filename, value in data_cpu_mem.items():
+                df = pd.read_csv(filename, delimiter=',', names=columns, header=0, skiprows=0)
+                df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+                ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
+                        color=color[color_index],
+                        label=f"{value['transport']} {value['compress']} {column} {value['size']}")
+                linetype_index = (linetype_index + 1) % 8
+                color_index = (color_index + 1) % 7
+
+            ax.set_title(type_node + " " + column)
+            ax.set_ylabel(column)
+            ax.set_xlabel('Time [s]')
+            ax.legend()
+
     if type_node == 'publisher':
         columns = ['fps']
     else:
@@ -69,17 +93,27 @@ for type_node in ['publisher', 'subscriber']:
 
     for size in sizes:
         for column in columns:
+            color_index = 0
+            linetype_index = 0
+
             fig, ax = plt.subplots()
             for filename, value in data.items():
                 print('filename ', filename)
                 print('value ', value)
                 if value['size'] == size:
+                    print(filename, columns)
+                    print(type_node)
                     df = pd.read_csv(filename, delimiter=',',
                                      names=columns, header=0, skiprows=0)
                     x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
                     transport = value['transport']
                     ax.plot(x, df[column].values,
-                            label=f"{transport} {value['compress']} {column} {value['size']}")
+                            label=f"{transport} {value['compress']} {column} {value['size']}",
+                            color=color[color_index],
+                            linestyle=linetype[linetype_index])
+                    linetype_index = (linetype_index + 1) % 8
+                    color_index = (color_index + 1) % 7
+
             ax.set_title(type_node + ' ' + column + ' ' + size)
             ax.set_ylabel(column)
             ax.set_xlabel('Time [s]')

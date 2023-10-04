@@ -28,6 +28,11 @@ int main(int argc, char ** argv)
   node->get_parameter("transport_hint", transport_hint);
   node->SetTransportHint(transport_hint);
 
+  node->declare_parameter("loop_time", 300);
+  int loop_time{300};
+  node->get_parameter("loop_time", loop_time);
+  node->SetLoopTime(loop_time);
+
   node->Initialize();
 
   rclcpp::WallRate loop_rate(30);

@@ -42,6 +42,7 @@ public:
   void checkSubscribers();
   void Destroy();
   bool IsFinished();
+  void SetLoopTime(int _loop_time);
 
 private:
   void pointCloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr & msg);
@@ -59,7 +60,9 @@ private:
 
   std::atomic<bool> stop_{false};
 
-  double last_update{0};
+  int loop_time_{300};
+
+  double initial_time{0};
   int compress_{0};
 };
 }  // namespace performance_transport

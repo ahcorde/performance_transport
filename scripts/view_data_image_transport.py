@@ -28,27 +28,27 @@ png_compress = ['3', '6', '9']
 zstd_compress = ['3', '6', '9']
 image_sizes = ['4096', '2048', '1024', '512']
 
-raw_cpu_mem = {}
-raw = {}
-
-jpeg_90_cpu_mem = {}
-jpeg_90 = {}
-
-png_90_cpu_mem = {}
-png_90 = {}
-
-zstd_90_cpu_mem = {}
-zstd_90 = {}
-
 color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 linetype = ['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']
 
 color_index = 0
 linetype_index = 0
 
-for type_node in ['publisher']:
+for type_node in ['publisher', 'subscriber']:
     data_cpu_mem_str = os.path.join(folder_name, type_node + '_data_cpu_mem')
     data_str = os.path.join(folder_name, type_node + '_data')
+
+    raw_cpu_mem = {}
+    raw = {}
+
+    jpeg_90_cpu_mem = {}
+    jpeg_90 = {}
+
+    png_90_cpu_mem = {}
+    png_90 = {}
+
+    zstd_90_cpu_mem = {}
+    zstd_90 = {}
 
     for transport in transport_hint:
         for size in image_sizes:

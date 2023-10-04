@@ -40,6 +40,11 @@ SubscriberPointCloudTransport::~SubscriberPointCloudTransport()
   this->Destroy();
 }
 
+void SubscriberPointCloudTransport::SetLoopTime(int _loop_time)
+{
+  this->loop_time_ = _loop_time;
+}
+
 void SubscriberPointCloudTransport::Destroy()
 {
   if (this->dataCollector_ != nullptr) {
@@ -64,9 +69,9 @@ bool SubscriberPointCloudTransport::IsFinished()
 void SubscriberPointCloudTransport::checkSubscribers()
 {
   auto current_time_stamp_seconds = timeToSec(this->now());
-  auto diff = current_time_stamp_seconds - this->last_update;
+  auto diff = current_time_stamp_seconds - this->initial_time;
 
-  if (diff > 5) {
+  if (diff > this->loop_time_) {
     this->stop_ = true;
   }
 }
@@ -102,6 +107,7 @@ void SubscriberPointCloudTransport::pointCloudCallback(
       1s,
       std::bind(&SubscriberPointCloudTransport::checkSubscribers, this));
     this->start = std::chrono::high_resolution_clock::now();
+    this->initial_time = timeToSec(this->now());
   }
 
   auto msg_time_stamp_seconds = timeToSec(msg->header.stamp);
@@ -109,14 +115,13 @@ void SubscriberPointCloudTransport::pointCloudCallback(
 
   this->diff_time_sim_ += current_time_stamp_seconds - msg_time_stamp_seconds;
 
-  this->last_update = current_time_stamp_seconds;
-
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<float> elapsed = finish - this->start;
   if (elapsed.count() > 1) {
     double fps = static_cast<double>(this->count_) / static_cast<double>(elapsed.count());
     double response_time = static_cast<double>(this->diff_time_sim_) /
       static_cast<double>(this->count_);
+    std::cout << "fps " << fps << std::endl;
     this->count_ = 0;
     this->diff_time_sim_ = 0;
     this->start = std::chrono::high_resolution_clock::now();
