@@ -123,6 +123,12 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
       filenameSystemData += std::string("_") + this->compress_type_;
       filenameSystemData += std::string("_") + std::to_string(this->compress_);
     }
+
+    if (this->transport_hint_ == "zstd") {
+      filename += std::string("_") + std::to_string(this->compress_);
+      filenameSystemData += std::string("_") + std::to_string(this->compress_);
+    }
+
     filename += ".csv";
     filenameSystemData += ".csv";
 
