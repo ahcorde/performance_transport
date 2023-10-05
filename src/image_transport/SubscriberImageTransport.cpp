@@ -75,6 +75,10 @@ void SubscriberImageTransport::Destroy()
   this->timer_->cancel();
 }
 
+void SubscriberImageTransport::SetLoopTime(int _loop_time)
+{
+  this->loop_time_ = _loop_time;
+}
 
 bool SubscriberImageTransport::IsFinished()
 {
@@ -84,9 +88,9 @@ bool SubscriberImageTransport::IsFinished()
 void SubscriberImageTransport::checkSubscribers()
 {
   auto current_time_stamp_seconds = timeToSec(this->now());
-  auto diff = current_time_stamp_seconds - this->last_update;
+  auto diff = current_time_stamp_seconds - this->initial_time;
 
-  if (diff > 1) {
+  if (diff > this->loop_time_) {
     this->stop_ = true;
   }
 }
@@ -100,8 +104,6 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
   auto current_time_stamp_seconds = timeToSec(this->now());
 
   this->diff_time_sim_ += current_time_stamp_seconds - msg_time_stamp_seconds;
-
-  this->last_update = current_time_stamp_seconds;
 
   if (this->size_ != msg->width) {
     this->size_ = msg->width;
@@ -142,6 +144,7 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
       1s,
       std::bind(&SubscriberImageTransport::checkSubscribers, this));
     this->start = std::chrono::high_resolution_clock::now();
+    this->initial_time = timeToSec(this->now());
   }
 
   auto finish = std::chrono::high_resolution_clock::now();
@@ -198,9 +201,9 @@ void SubscriberImageTransport::Initialize()
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
   image_transport::TransportHints th(this->shared_from_this().get(), this->transport_hint_);
   this->sub = it->subscribe(
-    "camera/image", 1,
+    "camera/image", rmw_qos_profile_sensor_data,
     std::bind(&SubscriberImageTransport::imageCallback, this, _1),
-    nullptr, &th);
+    nullptr, &th, rclcpp::SubscriptionOptions());
 
   RCLCPP_INFO(this->get_logger(), "Initialized");
 }

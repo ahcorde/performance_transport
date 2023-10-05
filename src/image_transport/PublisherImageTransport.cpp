@@ -108,7 +108,7 @@ int PublisherImageTransport::GetNumberOfImagesPublished()
 void PublisherImageTransport::Initialize()
 {
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
-  this->pub = this->it->advertise("camera/image", 1);
+  this->pub = this->it->advertise("camera/image", rmw_qos_profile_sensor_data);
   this->image_ = cv::imread(this->filename_, cv::IMREAD_COLOR);
 }
 

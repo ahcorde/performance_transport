@@ -116,6 +116,9 @@ int main(int argc, char ** argv)
   auto start_loop = std::chrono::high_resolution_clock::now();
   auto start = std::chrono::high_resolution_clock::now();
 
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(pit);
+
   while (rclcpp::ok()) {
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> elapsed = finish - start;
@@ -136,7 +139,7 @@ int main(int argc, char ** argv)
       break;
     }
     loop_rate.sleep();
-    rclcpp::spin_some(pit);
+    executor.spin_some();
   }
 
   systemDataCollector.Close();

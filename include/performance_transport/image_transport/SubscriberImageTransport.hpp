@@ -44,6 +44,7 @@ public:
   void SetCompressType(const std::string & _compress_type);
   bool IsFinished();
   void Destroy();
+  void SetLoopTime(int _loop_time);
 
 private:
   void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
@@ -63,8 +64,10 @@ private:
 
   std::shared_ptr<SystemDataCollector> systemDataCollector;
 
+  int loop_time_{300};
+
   double diff_time_sim_{0};
-  double last_update{0};
+  double initial_time{0};
 
   std::atomic<bool> stop_{false};
 };

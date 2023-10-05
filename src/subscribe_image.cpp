@@ -32,15 +32,23 @@ int main(int argc, char ** argv)
   node->get_parameter("compress_type", compress_type);
   node->SetCompressType(compress_type);
 
+  node->declare_parameter("loop_time", 300);
+  int loop_time{300};
+  node->get_parameter("loop_time", loop_time);
+  node->SetLoopTime(loop_time);
+
   std::cout << "transport_hint " << transport_hint << std::endl;
   std::cout << "compress_type " << compress_type << std::endl;
 
   node->Initialize();
 
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(node);
+
   rclcpp::WallRate loop_rate(30);
 
   while (rclcpp::ok() && !node->IsFinished()) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
     loop_rate.sleep();
   }
 

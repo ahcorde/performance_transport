@@ -23,6 +23,7 @@ folder_name = '/home/ahcorde/TRI/performance_transport_ws/build/performance_tran
 
 transport_hint = ['raw', 'compressed', 'zstd']
 compressed_types = ['jpeg', 'png']
+
 jpeg_compress = ['90', '50', '20']
 png_compress = ['3', '6', '9']
 zstd_compress = ['3', '6', '9']
@@ -61,23 +62,20 @@ for type_node in ['publisher', 'subscriber']:
                     if compress_type == 'jpeg':
                         for compress in jpeg_compress:
                             name2 = name + '_' + compress_type + '_' + compress + '.csv'
-                            if compress == '90':
-                                jpeg_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size}
-                                jpeg_90[data_str + name2] = {'size': size}
+                            jpeg_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
+                            jpeg_90[data_str + name2] = {'size': size, 'compress': compress}
                             # print(data_cpu_mem_str + name2)
                     if compress_type == 'png':
                         for compress in png_compress:
                             name2 = name + '_' + compress_type + '_' + compress + '.csv'
-                            if compress == '9':
-                                png_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size}
-                                png_90[data_str + name2] = {'size': size}
+                            png_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
+                            png_90[data_str + name2] = {'size': size, 'compress': compress}
                                 # print(data_str + name2)
             elif transport == 'zstd':
                 for compress in png_compress:
                     name2 = name + '_' + compress + '.csv'
-                    if compress == '9':
-                        zstd_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size}
-                        zstd_90[data_str + name2] = {'size': size}
+                    zstd_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
+                    zstd_90[data_str + name2] = {'size': size, 'compress': compress}
                         # print(data_str + name2)
 
     columns = ['timestamp', 'uptime', 'cpuusage', 'memory', 'anonmemory',
@@ -87,9 +85,6 @@ for type_node in ['publisher', 'subscriber']:
         if column == 'timestamp' or column == 'uptime':
             continue
         fig, ax = plt.subplots()
-
-        color_index = 0
-        linetype_index = 0
 
         for compress_90, value in raw_cpu_mem.items():
             df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
@@ -104,10 +99,9 @@ for type_node in ['publisher', 'subscriber']:
             df['timestamp'] = df['timestamp'] - df['timestamp'][0]
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"JPEG {column} {value['size']}x{value['size']}")
+                    label=f"JPEG {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
-
-        color_index = color_index + 1
+            color_index = (color_index + 1) % 7
         for compress_90, value in png_90_cpu_mem.items():
             print(compress_90)
             df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
@@ -117,19 +111,19 @@ for type_node in ['publisher', 'subscriber']:
             print(color[color_index])
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"PNG {column} {value['size']}x{value['size']}")
+                    label=f"PNG {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
-
-        color_index = color_index + 1
+            color_index = (color_index + 1) % 7
         for compress_90, value in zstd_90_cpu_mem.items():
             df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
             df['timestamp'] = df['timestamp'] - df['timestamp'][0]
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"ZSTD {column} {value['size']}x{value['size']}")
+                    label=f"ZSTD {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
+            color_index = (color_index + 1) % 7
 
-        ax.set_title(column)
+        ax.set_title(type_node + " " + column)
         ax.set_ylabel(column)
         ax.set_xlabel('Time [s]')
         ax.legend()
@@ -139,12 +133,12 @@ for type_node in ['publisher', 'subscriber']:
     else:
         columns = ['fps', 'response_t']
 
+    color_index = 0
+    linetype_index = 0
+
     for column in columns:
         if column == 'timestamp':
             continue
-
-        color_index = 0
-        linetype_index = 0
 
         fig, ax = plt.subplots()
         for raw_file, value in raw.items():
@@ -163,27 +157,28 @@ for type_node in ['publisher', 'subscriber']:
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"JPEG {column} {value['size']}x{value['size']}")
+                    label=f"JPEG {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
-        color_index = color_index + 1
+            color_index = (color_index + 1) % 7
         for compress_90, value in png_90.items():
             print(compress_90)
             df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"PNG {column} {value['size']}x{value['size']}")
+                    label=f"PNG {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
-        color_index = color_index + 1
+            color_index = (color_index + 1) % 7
         for compress_90, value in zstd_90.items():
             print(compress_90)
             df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"ZSTD {column} {value['size']}x{value['size']}")
+                    label=f"ZSTD {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
-        ax.set_title(column)
+            color_index = (color_index + 1) % 7
+        ax.set_title(type_node + " " + column)
         ax.set_ylabel(column)
         ax.set_xlabel('Time [s]')
         ax.set_title(f'{type_node} {column}')
