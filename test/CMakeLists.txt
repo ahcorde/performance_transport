@@ -38,6 +38,19 @@ foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
     endforeach()
 endforeach()
 
+set(COMPRESS_VALUES 90 50 20)
+set(COMPRESS_TYPE avif)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    foreach(SIZE IN LISTS SIZES)
+        message("Created test: " test_image_transport_${SIZE}_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+        add_launch_test(test_image_transport.py
+            TARGET test_image_transport_${SIZE}_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+            ARGS "size:=${SIZE}" "transport_type:=avif" "compress_type:=${COMPRESS_TYPE}" "compress:=${COMPRESS_VALUE}"
+            TIMEOUT 330
+        )
+    endforeach()
+endforeach()
+
 foreach(SIZE IN LISTS SIZES)
     message("Created test: " test_image_transport_${SIZE}_raw)
     add_launch_test(test_image_transport.py

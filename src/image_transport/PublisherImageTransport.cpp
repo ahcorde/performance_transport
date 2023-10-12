@@ -126,6 +126,8 @@ void PublisherImageTransport::SetCompressJpegParameter()
     this->set_parameter(rclcpp::Parameter("camera.image.compressed.png_level", this->compress_));
   } else if (this->compress_type_ == "zstd") {
     this->set_parameter(rclcpp::Parameter("camera.image.zstd.zstd_level", this->compress_));
+  } else if (this->compress_type_ == "avif") {
+    this->set_parameter(rclcpp::Parameter("camera.image.avif.quality", this->compress_));
   }
 }
 

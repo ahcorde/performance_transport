@@ -98,7 +98,7 @@ int main(int argc, char ** argv)
     filenameSystemData += std::string("_") + std::to_string(compress);
   }
 
-  if (transport_hint == "zstd") {
+  if (transport_hint == "zstd" || transport_hint == "avif") {
     filenameStats += std::string("_") + std::to_string(compress);
     filenameSystemData += std::string("_") + std::to_string(compress);
   }

@@ -126,7 +126,7 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
       filenameSystemData += std::string("_") + std::to_string(this->compress_);
     }
 
-    if (this->transport_hint_ == "zstd") {
+    if (this->transport_hint_ == "zstd" || this->transport_hint_ == "avif") {
       filename += std::string("_") + std::to_string(this->compress_);
       filenameSystemData += std::string("_") + std::to_string(this->compress_);
     }
@@ -153,6 +153,7 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
     double fps = static_cast<double>(this->count_) / static_cast<double>(elapsed.count());
     double response_time = static_cast<double>(this->diff_time_sim_) /
       static_cast<double>(this->count_);
+    std::cout << "fps: " << fps << std::endl;
     this->count_ = 0;
     this->diff_time_sim_ = 0;
     this->start = std::chrono::high_resolution_clock::now();
@@ -186,8 +187,9 @@ void SubscriberImageTransport::Initialize()
     param_name = "camera.image.compressed.png_level";
   } else if (this->compress_type_ == "zstd") {
     param_name = "camera.image.zstd.zstd_level";
+  } else if (this->compress_type_ == "avif") {
+    param_name = "camera.image.avif.quality";
   }
-
   for (
     auto & parameter : parameters_client->get_parameters({param_name}))
   {
@@ -200,10 +202,15 @@ void SubscriberImageTransport::Initialize()
 
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
   image_transport::TransportHints th(this->shared_from_this().get(), this->transport_hint_);
+
+  auto cb_group = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+  rclcpp::SubscriptionOptions sub_options;
+  sub_options.callback_group = cb_group;
+
   this->sub = it->subscribe(
     "camera/image", rmw_qos_profile_sensor_data,
     std::bind(&SubscriberImageTransport::imageCallback, this, _1),
-    nullptr, &th, rclcpp::SubscriptionOptions());
+    nullptr, &th, sub_options);
 
   RCLCPP_INFO(this->get_logger(), "Initialized");
 }

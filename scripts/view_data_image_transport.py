@@ -13,21 +13,27 @@
 # limitations under the License.
 
 import os
-
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
 import pandas as pd
 
-folder_name = '/home/ahcorde/TRI/performance_transport_ws/build/performance_transport/test'
+folder_name = sys.argv[1]
 
 transport_hint = ['raw', 'compressed', 'zstd']
 compressed_types = ['jpeg', 'png']
+
+transport_hint = ['compressed']
+compressed_types = ['jpeg']
 
 jpeg_compress = ['90', '50', '20']
 png_compress = ['3', '6', '9']
 zstd_compress = ['3', '6', '9']
 image_sizes = ['4096', '2048', '1024', '512']
+
+jpeg_compress = ['90']
+image_sizes = ['4096']
 
 color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 linetype = ['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']

@@ -55,7 +55,8 @@ def generate_test_description():
         package='performance_transport',
         executable='subscribe_image',
         parameters=[{'compress_type': LaunchConfiguration('compress_type'),
-                     'transport_hint': LaunchConfiguration('transport_type')}],
+                     'transport_hint': LaunchConfiguration('transport_type'),
+                     'loop_time': LaunchConfiguration('loop_time')}],
         output='screen')
 
     return launch.LaunchDescription([

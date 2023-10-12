@@ -45,10 +45,11 @@ int main(int argc, char ** argv)
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
 
-  rclcpp::WallRate loop_rate(30);
+  std::thread executor_thread([&]() {executor.spin();});
+
+  rclcpp::WallRate loop_rate(10);
 
   while (rclcpp::ok() && !node->IsFinished()) {
-    executor.spin_some();
     loop_rate.sleep();
   }
 

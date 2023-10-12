@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 import pandas as pd
 
-folder_name = '/home/ahcorde/TRI/performance_transport_ws/build/performance_transport/test'
+folder_name = sys.argv[1]
 
 transport_hint = ['raw', 'draco', 'zstd', 'zlib']
 compress_array = ['3', '6', '9']
