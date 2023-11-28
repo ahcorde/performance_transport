@@ -66,6 +66,9 @@ void PublisherImageTransport::Destroy()
 void PublisherImageTransport::SetImageSize(int _width, int _height)
 {
   std::lock_guard<std::mutex> lock(mutex_);
+  if (cap.isOpened()) {
+    return;
+  }
 
   std_msgs::msg::Header hdr;
   cv::Rect rect = cv::Rect(0, 0, _width, _height);
@@ -88,12 +91,22 @@ int PublisherImageTransport::Width()
 void PublisherImageTransport::PublishMessage()
 {
   std::lock_guard<std::mutex> lock(mutex_);
+  if (cap.isOpened()) {
+    cap >> this->image_;
+    if (this->image_.empty())
+      exit(0);
+    std_msgs::msg::Header hdr;
+    this->msg_ = cv_bridge::CvImage(hdr, "bgr8", this->image_).toImageMsg();
+  }
+
   this->msg_->header.stamp = this->now();
   this->pub.publish(this->msg_);
+
   if (this->count == 0) {
     SetCompressJpegParameter();
     SetCompressType();
   }
+
   count++;
 }
 
@@ -108,8 +121,22 @@ int PublisherImageTransport::GetNumberOfImagesPublished()
 void PublisherImageTransport::Initialize()
 {
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
-  this->pub = this->it->advertise("camera/image", rmw_qos_profile_sensor_data);
-  this->image_ = cv::imread(this->filename_, cv::IMREAD_COLOR);
+  this->pub = this->it->advertise("camera/image", rclcpp::SensorDataQoS().keep_last(100).reliable().get_rmw_qos_profile());
+  if (this->filename_.find("mp4") != std::string::npos)
+  {
+    cap = cv::VideoCapture(this->filename_);
+    if(!cap.isOpened()) {
+      std::cout << "Error opening video stream or file" << std::endl;
+      exit(-1);
+    }
+    std::cout << "Reading file " << this->filename_ << std::endl;
+
+    cap >> this->image_;
+  }
+  else
+  {
+    this->image_ = cv::imread(this->filename_, cv::IMREAD_COLOR);
+  }
 }
 
 void PublisherImageTransport::SetCompressJpeg(int _value)

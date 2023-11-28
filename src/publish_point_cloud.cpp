@@ -106,6 +106,7 @@ int main(int argc, char * argv[])
     if (elapsed.count() > 1) {
       double fps = static_cast<double>(ppc->GetNumberOfImagesPublished()) /
         static_cast<double>(elapsed.count());
+      std::cout << "fps: " << fps << std::endl;
       dataCollector.WriteLine(std::to_string(fps));
       start = finish;
     }

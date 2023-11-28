@@ -24,16 +24,17 @@ folder_name = sys.argv[1]
 transport_hint = ['raw', 'compressed', 'zstd']
 compressed_types = ['jpeg', 'png']
 
-transport_hint = ['compressed']
-compressed_types = ['jpeg']
+transport_hint = ['avif']
+compressed_types = ['avf']
 
 jpeg_compress = ['90', '50', '20']
 png_compress = ['3', '6', '9']
 zstd_compress = ['3', '6', '9']
+avif_compress = ['90', '50', '20']
 image_sizes = ['4096', '2048', '1024', '512']
 
 jpeg_compress = ['90']
-image_sizes = ['4096']
+image_sizes = ['4096', '2048', '1024', '512']
 
 color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 linetype = ['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']
@@ -56,6 +57,9 @@ for type_node in ['publisher', 'subscriber']:
 
     zstd_90_cpu_mem = {}
     zstd_90 = {}
+
+    avif_cpu_mem = {}
+    avif = {}
 
     for transport in transport_hint:
         for size in image_sizes:
@@ -82,6 +86,11 @@ for type_node in ['publisher', 'subscriber']:
                     name2 = name + '_' + compress + '.csv'
                     zstd_90_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
                     zstd_90[data_str + name2] = {'size': size, 'compress': compress}
+            elif transport == 'avif':
+                for compress in avif_compress:
+                    name2 = name + '_' + compress + '.csv'
+                    avif_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
+                    avif[data_str + name2] = {'size': size, 'compress': compress}
                         # print(data_str + name2)
 
     columns = ['timestamp', 'uptime', 'cpuusage', 'memory', 'anonmemory',
@@ -126,6 +135,14 @@ for type_node in ['publisher', 'subscriber']:
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
                     label=f"ZSTD {column} {value['compress']} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+            color_index = (color_index + 1) % 7
+        for compress_90, value in avif_cpu_mem.items():
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+            ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
+                    color=color[color_index],
+                    label=f"AVIF {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
 
@@ -182,6 +199,15 @@ for type_node in ['publisher', 'subscriber']:
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
                     label=f"ZSTD {column} {value['compress']} {value['size']}x{value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+            color_index = (color_index + 1) % 7
+        for compress_90, value in avif.items():
+            print(compress_90)
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
+            ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
+                    color=color[color_index],
+                    label=f"AVIF {column} {value['compress']} {value['size']}x{value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         ax.set_title(type_node + " " + column)

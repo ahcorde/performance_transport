@@ -203,12 +203,12 @@ void SubscriberImageTransport::Initialize()
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
   image_transport::TransportHints th(this->shared_from_this().get(), this->transport_hint_);
 
-  auto cb_group = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+  auto cb_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
   rclcpp::SubscriptionOptions sub_options;
   sub_options.callback_group = cb_group;
 
   this->sub = it->subscribe(
-    "camera/image", rmw_qos_profile_sensor_data,
+    "camera/image", rclcpp::SensorDataQoS().keep_last(100).reliable().get_rmw_qos_profile(),
     std::bind(&SubscriberImageTransport::imageCallback, this, _1),
     nullptr, &th, sub_options);
 

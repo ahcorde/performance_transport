@@ -22,6 +22,7 @@
 #include <image_transport/image_transport.hpp>
 
 #include <opencv2/core/mat.hpp>
+#include <opencv2/videoio.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/int32.hpp>
@@ -59,6 +60,8 @@ private:
   int count{0};
   int compress_{0};
   std::string compress_type_;
+  cv::VideoCapture cap;
+
 };
 }  // namespace performance_transport
 

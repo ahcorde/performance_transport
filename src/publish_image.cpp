@@ -126,6 +126,7 @@ int main(int argc, char ** argv)
     if (elapsed.count() > 1) {
       double fps = static_cast<double>(pit->GetNumberOfImagesPublished()) /
         static_cast<double>(elapsed.count());
+      std::cout << "fps: " << fps << std::endl;
       // std::cout << size << " " << size << " published in " << loop_time << " seconds: "
       //           << fps << " " << elapsed.count() << " compress " << compress << std::endl;
       dataCollector.WriteLine(std::to_string(fps));

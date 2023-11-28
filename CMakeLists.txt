@@ -43,6 +43,7 @@ ament_target_dependencies(publish_image
 target_link_libraries(publish_image
   image_transport::image_transport
   opencv_imgcodecs
+  opencv_videoio
   rclcpp::rclcpp
   performance_transport_utils
 )
