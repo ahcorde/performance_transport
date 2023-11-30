@@ -81,9 +81,9 @@ int main(int argc, char * argv[])
   int size = ppc->GetSize();
 
   std::string filenameStats = "publisher_point_cloud_data" + std::string("_") +
-      output_name + std::string("_") + transport_hint;
+    output_name + std::string("_") + transport_hint;
   std::string filenameSystemData = "publisher_point_cloud_data_cpu_mem" + std::string("_") +
-      output_name + std::string("_") + transport_hint;
+    output_name + std::string("_") + transport_hint;
 
   if (transport_hint != "raw") {
     filenameStats += std::string("_") + std::to_string(compress);
