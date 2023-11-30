@@ -95,7 +95,7 @@ def generate_test_description():
         ),
         DeclareLaunchArgument(
             'loop_time',
-            default_value=['10'],
+            default_value=['300'],
             description='Loop time',
         ),
         subscriber_image_node,
