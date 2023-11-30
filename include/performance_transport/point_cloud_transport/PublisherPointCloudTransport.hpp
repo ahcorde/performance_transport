@@ -24,6 +24,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
+#include <rosbag2_cpp/reader.hpp>
+
 namespace performance_transport
 {
 class PublisherPointCloudTransport : public rclcpp::Node
@@ -38,6 +40,7 @@ public:
   void SetCompress(int _value);
   void SetCompressParameter();
   void SetTransportHint(const std::string & _transport_hint);
+  void SetRosBag(const std::string & _rosbag_topic);
   void PublishMessage();
   int GetSize();
   int GetNumberOfImagesPublished();
@@ -49,11 +52,15 @@ private:
   sensor_msgs::msg::PointCloud2 cloud_msg_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::string filename_;
+  std::string rosbag_topic_;
   std::mutex mutex_;
   int count_{0};
   int compress_{0};
   std::string compress_type_;
   std::string transport_hint_;
+
+  rosbag2_cpp::readers::SequentialReader reader;
+  rclcpp::Serialization<sensor_msgs::msg::PointCloud2> image_serialization;
 };
 }  // namespace performance_transport
 

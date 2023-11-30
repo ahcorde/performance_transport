@@ -39,11 +39,13 @@ def generate_test_description():
     publish_image_node = Node(
         package='performance_transport',
         executable='publish_point_cloud',
-        parameters=[{'filename': [image_path, '/', LaunchConfiguration('filename')],
+        parameters=[{'filename': [LaunchConfiguration('filename')],
                      'compress': LaunchConfiguration('compress'),
                      'compress_type': LaunchConfiguration('compress_type'),
                      'transport_hint': LaunchConfiguration('transport_type'),
                      'loop_time': LaunchConfiguration('loop_time'),
+                     'rosbag_topic': LaunchConfiguration('rosbag_topic'),
+                     'output_name': LaunchConfiguration('output_name'),
                      'pct.point_cloud.enable_pub_plugins':
                      [['point_cloud_transport/', LaunchConfiguration('transport_type')]]}],
         output='screen')
@@ -51,7 +53,8 @@ def generate_test_description():
     subscriber_image_node = Node(
         package='performance_transport',
         executable='subscribe_point_cloud',
-        parameters=[{'transport_hint': LaunchConfiguration('transport_type')}],
+        parameters=[{'transport_hint': LaunchConfiguration('transport_type'),
+                     'output_name': LaunchConfiguration('output_name')}],
         output='screen')
 
     return launch.LaunchDescription([
@@ -59,6 +62,16 @@ def generate_test_description():
             'compress_type',
             default_value=[''],
             description='Compress type',
+        ),
+        DeclareLaunchArgument(
+            'output_name',
+            default_value=[''],
+            description='Output name',
+        ),
+        DeclareLaunchArgument(
+            'rosbag_topic',
+            default_value=[''],
+            description='Rosbag topic',
         ),
         DeclareLaunchArgument(
             'compress',
@@ -77,7 +90,7 @@ def generate_test_description():
         ),
         DeclareLaunchArgument(
             'loop_time',
-            default_value=['300'],
+            default_value=['10'],
             description='Loop time',
         ),
         subscriber_image_node,

@@ -95,6 +95,11 @@ void SubscriberImageTransport::checkSubscribers()
   }
 }
 
+void SubscriberImageTransport::SetOutputName(const std::string & _output_name)
+{
+  this->output_name_ = _output_name;
+}
+
 void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -109,13 +114,11 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
     this->size_ = msg->width;
 
     std::string filename = "subscriber_data" + std::string("_") +
-      std::to_string(size_) + std::string("_") +
-      std::to_string(size_) + std::string("_") +
+      this->output_name_ + std::string("_") +
       this->transport_hint_;
 
     std::string filenameSystemData = "subscriber_data_cpu_mem" + std::string("_") +
-      std::to_string(size_) + std::string("_") +
-      std::to_string(size_) + std::string("_") +
+      this->output_name_ + std::string("_") +
       this->transport_hint_;
 
     if (this->transport_hint_ == "compressed") {

@@ -27,6 +27,11 @@ int main(int argc, char ** argv)
   node->get_parameter("transport_hint", transport_hint);
   node->SetTransportHint(transport_hint);
 
+  node->declare_parameter("output_name", "");
+  std::string output_name;
+  node->get_parameter("output_name", output_name);
+  node->SetOutputName(output_name);
+
   node->declare_parameter("compress_type", "");
   std::string compress_type{""};
   node->get_parameter("compress_type", compress_type);

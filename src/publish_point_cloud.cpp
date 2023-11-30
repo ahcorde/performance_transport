@@ -47,6 +47,15 @@ int main(int argc, char * argv[])
   ppc->get_parameter("filename", filename);
   ppc->SetFilename(filename);
 
+  ppc->declare_parameter("output_name", "");
+  std::string output_name;
+  ppc->get_parameter("output_name", output_name);
+
+  ppc->declare_parameter("rosbag_topic", "");
+  std::string rosbag_topic;
+  ppc->get_parameter("rosbag_topic", rosbag_topic);
+  ppc->SetRosBag(rosbag_topic);
+
   ppc->declare_parameter("compress", 0);
   int compress = 0;
   ppc->get_parameter("compress", compress);
@@ -72,10 +81,9 @@ int main(int argc, char * argv[])
   int size = ppc->GetSize();
 
   std::string filenameStats = "publisher_point_cloud_data" + std::string("_") +
-    std::to_string(size) + std::string("_") + transport_hint;
-
+      output_name + std::string("_") + transport_hint;
   std::string filenameSystemData = "publisher_point_cloud_data_cpu_mem" + std::string("_") +
-    std::to_string(size) + std::string("_") + transport_hint;
+      output_name + std::string("_") + transport_hint;
 
   if (transport_hint != "raw") {
     filenameStats += std::string("_") + std::to_string(compress);

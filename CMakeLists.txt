@@ -18,6 +18,9 @@ find_package(point_cloud_transport REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(PCL REQUIRED QUIET COMPONENTS io)
 find_package(pcl_conversions REQUIRED)
+find_package(rcpputils REQUIRED)
+find_package(rosbag2_cpp REQUIRED)
+find_package(rosbag2_storage REQUIRED)
 
 include_directories(include)
 
@@ -26,8 +29,8 @@ add_library(performance_transport_utils SHARED
   src/utils/ProcessInfo.cpp
   src/utils/SystemDataCollector.cpp
 )
-ament_target_dependencies(performance_transport_utils
-  rclcpp
+target_link_libraries(performance_transport_utils
+  rclcpp::rclcpp
 )
 
 # add the publisher example
@@ -46,6 +49,9 @@ target_link_libraries(publish_image
   opencv_videoio
   rclcpp::rclcpp
   performance_transport_utils
+  rcpputils::rcpputils
+  rosbag2_cpp::rosbag2_cpp
+  rosbag2_storage::rosbag2_storage
 )
 
 # add the subscriber example
@@ -71,6 +77,9 @@ ament_target_dependencies(publish_point_cloud
   pcl_conversions
   point_cloud_transport
   rclcpp
+  rcpputils
+  rosbag2_cpp
+  rosbag2_storage
 )
 target_link_libraries(publish_point_cloud
   ${PCL_LIBRARIES}

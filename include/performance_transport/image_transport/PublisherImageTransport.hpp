@@ -25,6 +25,9 @@
 #include <opencv2/videoio.hpp>
 
 #include <rclcpp/rclcpp.hpp>
+
+#include <rosbag2_cpp/reader.hpp>
+
 #include <std_msgs/msg/int32.hpp>
 
 namespace performance_transport
@@ -45,6 +48,7 @@ public:
   int GetNumberOfImagesPublished();
   void SetCompressType();
   void SetFilename(const std::string & _filename);
+  void SetRosBag(const std::string & _rosbag_topic);
   void SetCompressType(const std::string & _compress_type);
   void Destroy();
 
@@ -54,6 +58,7 @@ private:
 
   cv::Mat image_;
   std::string filename_;
+  std::string rosbag_topic_;
   rclcpp::TimerBase::SharedPtr timer_;
   sensor_msgs::msg::Image::SharedPtr msg_;
   std::mutex mutex_;
@@ -61,6 +66,9 @@ private:
   int compress_{0};
   std::string compress_type_;
   cv::VideoCapture cap;
+
+  rosbag2_cpp::readers::SequentialReader reader;
+  rclcpp::Serialization<sensor_msgs::msg::Image> image_serialization;
 
 };
 }  // namespace performance_transport

@@ -45,6 +45,15 @@ int main(int argc, char ** argv)
   pit->get_parameter("filename", filename);
   pit->SetFilename(filename);
 
+  pit->declare_parameter("rosbag_topic", "");
+  std::string rosbag_topic;
+  pit->get_parameter("rosbag_topic", rosbag_topic);
+  pit->SetRosBag(rosbag_topic);
+
+  pit->declare_parameter("output_name", "");
+  std::string output_name;
+  pit->get_parameter("output_name", output_name);
+
   pit->declare_parameter("size", 4096);
   int size = 0;
   pit->get_parameter("size", size);
@@ -81,13 +90,11 @@ int main(int argc, char ** argv)
   pit->SetCompressJpeg(compress);
 
   std::string filenameStats = "publisher_data" + std::string("_") +
-    std::to_string(size) + std::string("_") +
-    std::to_string(size) + std::string("_") +
+    output_name + std::string("_") +
     transport_hint;
 
   std::string filenameSystemData = "publisher_data_cpu_mem" + std::string("_") +
-    std::to_string(size) + std::string("_") +
-    std::to_string(size) + std::string("_") +
+    output_name + std::string("_") +
     transport_hint;
 
   if (transport_hint == "compressed") {

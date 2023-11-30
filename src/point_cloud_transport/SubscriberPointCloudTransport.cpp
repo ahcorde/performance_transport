@@ -76,19 +76,22 @@ void SubscriberPointCloudTransport::checkSubscribers()
   }
 }
 
+void SubscriberPointCloudTransport::SetOutputName(const std::string & _output_name)
+{
+  this->output_name_ = _output_name;
+}
+
 void SubscriberPointCloudTransport::pointCloudCallback(
   const sensor_msgs::msg::PointCloud2::ConstSharedPtr & msg)
 {
   this->count_++;
   if (systemDataCollector == nullptr) {
-    int size = msg->width * msg->height * msg->fields.size();
-
     std::string filename = "subscriber_point_cloud_data" + std::string("_") +
-      std::to_string(size) + std::string("_") +
+      output_name_ + std::string("_") +
       this->transport_hint_;
 
     std::string filenameSystemData = "subscriber_point_cloud_data_cpu_mem" + std::string("_") +
-      std::to_string(size) + std::string("_") +
+      output_name_ + std::string("_") +
       this->transport_hint_;
 
     if (this->transport_hint_ != "raw") {

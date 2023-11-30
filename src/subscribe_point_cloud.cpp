@@ -33,6 +33,11 @@ int main(int argc, char ** argv)
   node->get_parameter("loop_time", loop_time);
   node->SetLoopTime(loop_time);
 
+  node->declare_parameter("output_name", "");
+  std::string output_name;
+  node->get_parameter("output_name", output_name);
+  node->SetOutputName(output_name);
+
   node->Initialize();
 
   rclcpp::WallRate loop_rate(30);

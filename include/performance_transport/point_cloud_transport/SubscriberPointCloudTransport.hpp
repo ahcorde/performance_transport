@@ -43,6 +43,7 @@ public:
   void Destroy();
   bool IsFinished();
   void SetLoopTime(int _loop_time);
+  void SetOutputName(const std::string & _output_name);
 
 private:
   void pointCloudCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr & msg);
@@ -59,6 +60,7 @@ private:
   int count_{0};
 
   std::atomic<bool> stop_{false};
+  std::string output_name_;
 
   int loop_time_{300};
 

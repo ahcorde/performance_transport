@@ -46,6 +46,8 @@ def generate_test_description():
                      'compress_type': LaunchConfiguration('compress_type'),
                      'loop_time': LaunchConfiguration('loop_time'),
                      'transport_hint': LaunchConfiguration('transport_type'),
+                     'rosbag_topic': LaunchConfiguration('rosbag_topic'),
+                     'output_name': LaunchConfiguration('output_name'),
                      'camera.image.enable_pub_plugins': [['image_transport/',
                                                           LaunchConfiguration('transport_type')]]
                      }],
@@ -56,7 +58,8 @@ def generate_test_description():
         executable='subscribe_image',
         parameters=[{'compress_type': LaunchConfiguration('compress_type'),
                      'transport_hint': LaunchConfiguration('transport_type'),
-                     'loop_time': LaunchConfiguration('loop_time')}],
+                     'loop_time': LaunchConfiguration('loop_time'),
+                     'output_name': LaunchConfiguration('output_name')}],
         output='screen')
 
     return launch.LaunchDescription([
@@ -64,6 +67,16 @@ def generate_test_description():
             'compress',
             default_value=['10'],
             description='Compress value',
+        ),
+        DeclareLaunchArgument(
+            'rosbag_topic',
+            default_value=[''],
+            description='Rosbag topic',
+        ),
+        DeclareLaunchArgument(
+            'output_name',
+            default_value=[''],
+            description='Output name',
         ),
         DeclareLaunchArgument(
             'compress_type',
@@ -82,7 +95,7 @@ def generate_test_description():
         ),
         DeclareLaunchArgument(
             'loop_time',
-            default_value=['300'],
+            default_value=['10'],
             description='Loop time',
         ),
         subscriber_image_node,

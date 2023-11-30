@@ -45,6 +45,7 @@ public:
   bool IsFinished();
   void Destroy();
   void SetLoopTime(int _loop_time);
+  void SetOutputName(const std::string & _output_name);
 
 private:
   void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
@@ -61,6 +62,7 @@ private:
   std::chrono::time_point<std::chrono::system_clock> start;
 
   std::string compress_type_{};
+  std::string output_name_;
 
   std::shared_ptr<SystemDataCollector> systemDataCollector;
 

@@ -20,11 +20,15 @@
 #include <string>
 
 #include <rclcpp/rclcpp.hpp>
+#include <rcpputils/filesystem_helper.hpp>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/core/mat.hpp>
 
 #include <cv_bridge/cv_bridge.hpp>
+
+#include <rosbag2_storage/storage_options.hpp>
+#include <rosbag2_cpp/converter_interfaces/serialization_format_converter.hpp>
 
 using namespace std::chrono_literals;
 
@@ -51,6 +55,11 @@ void PublisherImageTransport::SetCompressType(
   this->compress_type_ = _compress_type;
 }
 
+void PublisherImageTransport::SetRosBag(const std::string & _rosbag_topic)
+{
+  this->rosbag_topic_ = _rosbag_topic;
+}
+
 PublisherImageTransport::~PublisherImageTransport()
 {
   this->Destroy();
@@ -69,6 +78,12 @@ void PublisherImageTransport::SetImageSize(int _width, int _height)
   if (cap.isOpened()) {
     return;
   }
+  try{
+    if (reader.has_next())
+    {
+      return;
+    }
+  } catch (std::runtime_error&){}
 
   std_msgs::msg::Header hdr;
   cv::Rect rect = cv::Rect(0, 0, _width, _height);
@@ -99,6 +114,31 @@ void PublisherImageTransport::PublishMessage()
     this->msg_ = cv_bridge::CvImage(hdr, "bgr8", this->image_).toImageMsg();
   }
 
+  try{
+    if (reader.has_next())
+    {
+      auto serialized_message = reader.read_next();
+
+      while (serialized_message->topic_name != this->rosbag_topic_) {
+        // deserialize and convert to ros2 message
+        serialized_message = reader.read_next();
+        if (!reader.has_next())
+        {
+          reader.seek(0);
+        }
+      }
+
+      rclcpp::SerializedMessage extracted_serialized_msg(*serialized_message->serialized_data);
+      if (serialized_message->topic_name == this->rosbag_topic_)
+      {
+        image_serialization.deserialize_message(&extracted_serialized_msg, &(*this->msg_));
+      }
+    }
+  } catch (std::runtime_error&)
+  {
+
+  }
+
   this->msg_->header.stamp = this->now();
   this->pub.publish(this->msg_);
 
@@ -122,6 +162,7 @@ void PublisherImageTransport::Initialize()
 {
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
   this->pub = this->it->advertise("camera/image", rclcpp::SensorDataQoS().keep_last(100).reliable().get_rmw_qos_profile());
+  rcpputils::fs::path bag_file(this->filename_);
   if (this->filename_.find("mp4") != std::string::npos)
   {
     cap = cv::VideoCapture(this->filename_);
@@ -132,6 +173,33 @@ void PublisherImageTransport::Initialize()
     std::cout << "Reading file " << this->filename_ << std::endl;
 
     cap >> this->image_;
+  }
+  else if (rcpputils::fs::exists(bag_file) && bag_file.is_directory())
+  {
+    std::cout << "Openning bagfile " << bag_file << std::endl;
+    rosbag2_storage::StorageOptions storage_options;
+    storage_options.uri = this->filename_;
+    storage_options.storage_id = "mcap";
+    rosbag2_cpp::ConverterOptions converter_options;
+    converter_options.input_serialization_format = "cdr";
+    converter_options.output_serialization_format = "cdr";
+
+    // open the rosbag
+    reader.open(storage_options, converter_options);
+
+    auto serialized_message = reader.read_next();
+
+    while (serialized_message->topic_name != this->rosbag_topic_) {
+      // deserialize and convert to ros2 message
+      serialized_message = reader.read_next();
+    }
+
+    rclcpp::SerializedMessage extracted_serialized_msg(*serialized_message->serialized_data);
+    if (serialized_message->topic_name == this->rosbag_topic_)
+    {
+      this->msg_ = std::make_shared<sensor_msgs::msg::Image>();
+      image_serialization.deserialize_message(&extracted_serialized_msg, &(*this->msg_));
+    }
   }
   else
   {
