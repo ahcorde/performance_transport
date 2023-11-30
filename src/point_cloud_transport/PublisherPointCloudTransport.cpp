@@ -172,7 +172,7 @@ void PublisherPointCloudTransport::Initialize()
       image_serialization.deserialize_message(&extracted_serialized_msg, &this->cloud_msg_);
     }
 
-  } else if (this->filename_ == "" ||
+  } else if (this->filename_.empty() || // NOLINT
     pcl::io::loadPCDFile(this->filename_, this->cloud_msg_) == -1)
   {
     RCLCPP_ERROR(this->get_logger(), "failed to open PCD file");

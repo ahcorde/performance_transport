@@ -133,7 +133,6 @@ void PublisherImageTransport::PublishMessage()
       }
     }
   } catch (std::runtime_error &) {
-
   }
 
   this->msg_->header.stamp = this->now();

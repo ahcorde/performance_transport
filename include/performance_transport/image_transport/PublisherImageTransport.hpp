@@ -69,7 +69,6 @@ private:
 
   rosbag2_cpp::readers::SequentialReader reader;
   rclcpp::Serialization<sensor_msgs::msg::Image> image_serialization;
-
 };
 }  // namespace performance_transport
 
