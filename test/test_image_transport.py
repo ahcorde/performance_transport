@@ -40,7 +40,7 @@ def generate_test_description():
     publish_image_node = Node(
         package='performance_transport',
         executable='publish_image',
-        parameters=[{'filename': image_path,
+        parameters=[{'filename': LaunchConfiguration('filename'),
                      'size': LaunchConfiguration('size'),
                      'compress': LaunchConfiguration('compress'),
                      'compress_type': LaunchConfiguration('compress_type'),
@@ -82,6 +82,11 @@ def generate_test_description():
             'compress_type',
             default_value=[''],
             description='Compress type',
+        ),
+        DeclareLaunchArgument(
+            'filename',
+            default_value=[''],
+            description='Video or rosbag file',
         ),
         DeclareLaunchArgument(
             'size',

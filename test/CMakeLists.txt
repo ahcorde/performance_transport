@@ -91,7 +91,7 @@ foreach(PointCloudFile IN LISTS PointCloudFiles)
 endforeach()
 
 # indoor
-set(TRANSPORT_TYPES zlib zstd)
+set(TRANSPORT_TYPES draco zlib zstd)
 foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
     foreach(TRANSPORT_TYPE IN LISTS TRANSPORT_TYPES)
         message("Created test: " test_point_cloud_transport_rosbag_indoor_${TRANSPORT_TYPE}_${COMPRESS_VALUE})
@@ -110,7 +110,7 @@ foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
 endforeach()
 
 # outdoor
-set(TRANSPORT_TYPES zlib zstd)
+set(TRANSPORT_TYPES draco zlib zstd)
 foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
     foreach(TRANSPORT_TYPE IN LISTS TRANSPORT_TYPES)
         message("Created test: " test_point_cloud_transport_rosbag_outdoor_${TRANSPORT_TYPE}_${COMPRESS_VALUE})
@@ -127,3 +127,173 @@ foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
         )
     endforeach()
 endforeach()
+
+# indoor
+set(COMPRESS_VALUES 90 50 20)
+set(COMPRESS_TYPE jpeg)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_indoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_indoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+        "rosbag_topic:=d455_1_rgb_image"
+        "output_name:=indoor"
+        "transport_type:=compressed"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()
+
+set(COMPRESS_VALUES 3 6 9)
+set(COMPRESS_TYPE png)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_indoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_indoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "transport_type:=compressed"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+        "rosbag_topic:=d455_1_rgb_image"
+        "output_name:=indoor"
+        TIMEOUT 330
+    )
+endforeach()
+
+set(COMPRESS_VALUES 3 6 9)
+set(COMPRESS_TYPE zstd)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_indoor_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_indoor_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+        "rosbag_topic:=d455_1_rgb_image"
+        "output_name:=indoor"
+        "transport_type:=zstd"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()
+
+# outdoor
+set(COMPRESS_VALUES 90 50 20)
+set(COMPRESS_TYPE jpeg)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_outdoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_outdoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/ros2_output"
+        "output_name:=outdoor"
+        "rosbag_topic:=/kitti/camera_color_left/image_raw"
+        "transport_type:=compressed"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()
+
+set(COMPRESS_VALUES 3 6 9)
+set(COMPRESS_TYPE png)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_outdoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_outdoor_compressed_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "transport_type:=compressed"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        "filename:=/home/ahcorde/TRI/kitti/ros2_output"
+        "rosbag_topic:=/kitti/camera_color_left/image_raw"
+        "output_name:=outdoor"
+        TIMEOUT 330
+    )
+endforeach()
+
+set(COMPRESS_VALUES 3 6 9)
+set(COMPRESS_TYPE zstd)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_outdoor_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_outdoor_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/ros2_output"
+        "output_name:=outdoor"
+        "rosbag_topic:=/kitti/camera_color_left/image_raw"
+        "transport_type:=zstd"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()
+
+set(COMPRESS_VALUES 90 50 20)
+set(COMPRESS_TYPE avif)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_outdoor_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_outdoor_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/ros2_output"
+        "output_name:=outdoor"
+        "rosbag_topic:=/kitti/camera_color_left/image_raw"
+        "transport_type:=${COMPRESS_TYPE}"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+    message("Created test: " test_image_transport_rosbag_indoor_${COMPRESS_TYPE}_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_rosbag_indoor_${COMPRESS_TYPE}_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+        "output_name:=indoor"
+        "rosbag_topic:=d455_1_rgb_image"
+        "transport_type:=${COMPRESS_TYPE}"
+        "compress_type:=${COMPRESS_TYPE}"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()
+
+message("Created test: " test_image_transport_indoor_raw)
+add_launch_test(test_image_transport.py
+    TARGET test_image_transport_indoor_raw
+    ARGS
+    "transport_type:=raw"
+    "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+    "rosbag_topic:=d455_1_rgb_image"
+    "output_name:=indoor"
+    TIMEOUT 330
+)
+
+message("Created test: " test_image_transport_outdoor_raw)
+add_launch_test(test_image_transport.py
+    TARGET test_image_transport_outdoor_raw
+    ARGS
+    "transport_type:=raw"
+    "filename:=/home/ahcorde/TRI/kitti/ros2_output"
+    "rosbag_topic:=/kitti/camera_color_left/image_raw"
+    "output_name:=outdoor"
+    TIMEOUT 330
+)
+
+message("Created test: " test_image_transport_outdoor_svtav1)
+add_launch_test(test_image_transport.py
+    TARGET test_image_transport_outdoor_svtav1
+    ARGS
+    "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+    "output_name:=indoor"
+    "rosbag_topic:=d455_1_rgb_image"
+    "transport_type:=svtav1"
+    "compress_type:=svtav1"
+    "compress:=10"
+    TIMEOUT 330
+)

@@ -78,8 +78,6 @@ int main(int argc, char * argv[])
 
   ppc->SetCompress(compress);
 
-  int size = ppc->GetSize();
-
   std::string filenameStats = "publisher_point_cloud_data" + std::string("_") +
     output_name + std::string("_") + transport_hint;
   std::string filenameSystemData = "publisher_point_cloud_data_cpu_mem" + std::string("_") +
