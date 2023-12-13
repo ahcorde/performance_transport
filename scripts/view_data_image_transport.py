@@ -24,17 +24,20 @@ folder_name = sys.argv[1]
 transport_hint = ['raw', 'compressed', 'zstd']
 compressed_types = ['jpeg', 'png']
 
-transport_hint = ['avif']
-compressed_types = ['avf']
-
 jpeg_compress = ['90', '50', '20']
 png_compress = ['3', '6', '9']
 zstd_compress = ['3', '6', '9']
-avif_compress = ['90', '50', '20']
+avif_compress = ['90']
+svtav1_compress = ['8', '11', '13']
 image_sizes = ['4096', '2048', '1024', '512']
 
-jpeg_compress = ['90']
-image_sizes = ['4096', '2048', '1024', '512']
+jpeg_compress = ['90', '50', '20']
+image_sizes = ['outdoor']
+transport_hint = ['compressed', 'zstd']
+compressed_types = ['jpeg', 'png']
+
+transport_hint = ['svtav1']
+image_sizes = ['indoor', 'outdoor']
 
 color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 linetype = ['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']
@@ -61,9 +64,12 @@ for type_node in ['publisher', 'subscriber']:
     avif_cpu_mem = {}
     avif = {}
 
+    svtav1_cpu_mem = {}
+    svtav1 = {}
+
     for transport in transport_hint:
         for size in image_sizes:
-            name = '_' + str(size) + '_' + str(size) + '_' + transport
+            name = '_' + str(size) + '_' + transport
             if transport == 'raw':
                 raw_cpu_mem[data_cpu_mem_str + name + '.csv'] = {'size': size}
                 raw[data_str + name + '.csv'] = {'size': size}
@@ -92,6 +98,13 @@ for type_node in ['publisher', 'subscriber']:
                     avif_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
                     avif[data_str + name2] = {'size': size, 'compress': compress}
                         # print(data_str + name2)
+            elif transport == 'svtav1':
+                # for compress in avif_compress:
+                for compress in svtav1_compress:
+                    name2 = name + '_' + compress + '.csv'
+                    svtav1_cpu_mem[data_cpu_mem_str + name2] = {'size': size, 'compress': compress}
+                    svtav1[data_str + name2] = {'size': size, 'compress': compress}
+                        # print(data_str + name2)
 
     columns = ['timestamp', 'uptime', 'cpuusage', 'memory', 'anonmemory',
                'vm', 'rmbytes', 'tmbytes', 'rpackets', 'tpackets']
@@ -106,7 +119,7 @@ for type_node in ['publisher', 'subscriber']:
             df['timestamp'] = df['timestamp'] - df['timestamp'][0]
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"RAW {column} {value['size']}x{value['size']}")
+                    label=f"RAW {column} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
         color_index = color_index + 1
         for compress_90, value in jpeg_90_cpu_mem.items():
@@ -114,7 +127,7 @@ for type_node in ['publisher', 'subscriber']:
             df['timestamp'] = df['timestamp'] - df['timestamp'][0]
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"JPEG {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"JPEG {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         for compress_90, value in png_90_cpu_mem.items():
@@ -126,7 +139,7 @@ for type_node in ['publisher', 'subscriber']:
             print(color[color_index])
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"PNG {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"PNG {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         for compress_90, value in zstd_90_cpu_mem.items():
@@ -134,7 +147,7 @@ for type_node in ['publisher', 'subscriber']:
             df['timestamp'] = df['timestamp'] - df['timestamp'][0]
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"ZSTD {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"ZSTD {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         for compress_90, value in avif_cpu_mem.items():
@@ -142,7 +155,15 @@ for type_node in ['publisher', 'subscriber']:
             df['timestamp'] = df['timestamp'] - df['timestamp'][0]
             ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"AVIF {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"AVIF {column} {value['compress']} {value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+            color_index = (color_index + 1) % 7
+        for compress_90, value in svtav1_cpu_mem.items():
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+            ax.plot(df['timestamp'].values, df[column].values, linestyle=linetype[linetype_index],
+                    color=color[color_index],
+                    label=f"SVTAV1 {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
 
@@ -170,7 +191,7 @@ for type_node in ['publisher', 'subscriber']:
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"RAW {column} {value['size']}x{value['size']}")
+                    label=f"RAW {column} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
 
         color_index = color_index + 1
@@ -180,7 +201,7 @@ for type_node in ['publisher', 'subscriber']:
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"JPEG {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"JPEG {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         for compress_90, value in png_90.items():
@@ -189,7 +210,7 @@ for type_node in ['publisher', 'subscriber']:
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"PNG {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"PNG {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         for compress_90, value in zstd_90.items():
@@ -198,7 +219,7 @@ for type_node in ['publisher', 'subscriber']:
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"ZSTD {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"ZSTD {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
         for compress_90, value in avif.items():
@@ -207,9 +228,19 @@ for type_node in ['publisher', 'subscriber']:
             x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
             ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
                     color=color[color_index],
-                    label=f"AVIF {column} {value['compress']} {value['size']}x{value['size']}")
+                    label=f"AVIF {column} {value['compress']} {value['size']}")
             linetype_index = (linetype_index + 1) % 8
             color_index = (color_index + 1) % 7
+        for compress_90, value in svtav1.items():
+            print(compress_90)
+            df = pd.read_csv(compress_90, delimiter=',', names=columns, header=0, skiprows=0)
+            x = np.linspace(0, 300, df['fps'].values.size, endpoint=False)
+            ax.plot(x, df[column].values, linestyle=linetype[linetype_index],
+                    color=color[color_index],
+                    label=f"SVTAV1 {column} {value['compress']} {value['size']}")
+            linetype_index = (linetype_index + 1) % 8
+            color_index = (color_index + 1) % 7
+
         ax.set_title(type_node + " " + column)
         ax.set_ylabel(column)
         ax.set_xlabel('Time [s]')

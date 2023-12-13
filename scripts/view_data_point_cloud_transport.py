@@ -22,10 +22,10 @@ import pandas as pd
 
 folder_name = sys.argv[1]
 
-transport_hint = ['raw', 'draco', 'zstd', 'zlib']
+# transport_hint = ['raw', 'draco', 'zstd', 'zlib']
+transport_hint = ['zlib', 'zstd', 'draco']
 compress_array = ['3', '6', '9']
-sizes = ['2762400', '75260', '1179084']
-sizes = ['1179084']
+sizes = ['indoor', 'outdoor']
 
 color = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 linetype = ['-', '--', '-.', ':', 'solid', 'dashed', 'dashdot', 'dotted']
