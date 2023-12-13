@@ -158,8 +158,7 @@ void PublisherImageTransport::Initialize()
 {
   this->it = std::make_shared<image_transport::ImageTransport>(this->shared_from_this());
   this->pub = this->it->advertise(
-    "camera/image", rclcpp::SensorDataQoS().keep_last(
-      100).reliable().get_rmw_qos_profile());
+    "camera/image", rclcpp::SensorDataQoS().get_rmw_qos_profile());
   rcpputils::fs::path bag_file(this->filename_);
   if (this->filename_.find("mp4") != std::string::npos) {
     cap = cv::VideoCapture(this->filename_);
@@ -216,7 +215,7 @@ void PublisherImageTransport::SetCompressJpegParameter()
   } else if (this->compress_type_ == "avif") {
     this->set_parameter(rclcpp::Parameter("camera.image.avif.quality", this->compress_));
   } else if (this->compress_type_ == "svtav1") {
-    this->set_parameter(rclcpp::Parameter("camera.image.svtav1.quality", this->compress_));
+    this->set_parameter(rclcpp::Parameter("camera.image.svtav1.enc_mode", this->compress_));
   }
 }
 

@@ -70,11 +70,11 @@ foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
             add_launch_test(test_point_cloud.py
                     TARGET test_point_cloud_transport_${PointCloudFile}_${TRANSPORT_TYPE}_${COMPRESS_VALUE}
                     ARGS
-                        "filename:=${PointCloudFile}.pcd"
+                        "filename:=/home/ahcorde/TRI/performance_transport_ws/src/performance_transport/resources/${PointCloudFile}.pcd"
                         "compress_type:=${TRANSPORT_TYPE}"
                         "transport_type:=${TRANSPORT_TYPE}"
                         "compress:=${COMPRESS_VALUE}"
-                        "output_name:=${PointCloudFiles}"
+                        "output_name:=${PointCloudFile}"
                     TIMEOUT 330
             )
         endforeach()
@@ -285,15 +285,32 @@ add_launch_test(test_image_transport.py
     TIMEOUT 330
 )
 
-message("Created test: " test_image_transport_outdoor_svtav1)
-add_launch_test(test_image_transport.py
-    TARGET test_image_transport_outdoor_svtav1
-    ARGS
-    "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
-    "output_name:=indoor"
-    "rosbag_topic:=d455_1_rgb_image"
-    "transport_type:=svtav1"
-    "compress_type:=svtav1"
-    "compress:=10"
-    TIMEOUT 330
-)
+set(COMPRESS_VALUES 8 11 13)
+foreach(COMPRESS_VALUE IN LISTS COMPRESS_VALUES)
+
+    message("Created test: " test_image_transport_outdoor_svtav1_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_outdoor_svtav1_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/ros2_output"
+        "output_name:=outdoor"
+        "rosbag_topic:=/kitti/camera_color_left/image_raw"
+        "transport_type:=svtav1"
+        "compress_type:=svtav1"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+
+    message("Created test: " test_image_transport_indoor_svtav1_${COMPRESS_VALUE})
+    add_launch_test(test_image_transport.py
+        TARGET test_image_transport_indoor_svtav1_${COMPRESS_VALUE}
+        ARGS
+        "filename:=/home/ahcorde/TRI/kitti/files/r2b_lounge_mcap/"
+        "output_name:=indoor"
+        "rosbag_topic:=d455_1_rgb_image"
+        "transport_type:=svtav1"
+        "compress_type:=svtav1"
+        "compress:=${COMPRESS_VALUE}"
+        TIMEOUT 330
+    )
+endforeach()

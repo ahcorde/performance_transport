@@ -129,7 +129,7 @@ void SubscriberImageTransport::imageCallback(const sensor_msgs::msg::Image::Cons
       filenameSystemData += std::string("_") + std::to_string(this->compress_);
     }
 
-    if (this->transport_hint_ == "zstd" || this->transport_hint_ == "avif") {
+    if (this->transport_hint_ == "zstd" || this->transport_hint_ == "avif" || this->transport_hint_ == "svtav1") {
       filename += std::string("_") + std::to_string(this->compress_);
       filenameSystemData += std::string("_") + std::to_string(this->compress_);
     }
@@ -192,7 +192,10 @@ void SubscriberImageTransport::Initialize()
     param_name = "camera.image.zstd.zstd_level";
   } else if (this->compress_type_ == "avif") {
     param_name = "camera.image.avif.quality";
+  } else if (this->compress_type_ == "svtav1") {
+    param_name = "camera.image.svtav1.enc_mode";
   }
+
   for (
     auto & parameter : parameters_client->get_parameters({param_name}))
   {
@@ -211,7 +214,7 @@ void SubscriberImageTransport::Initialize()
   sub_options.callback_group = cb_group;
 
   this->sub = it->subscribe(
-    "camera/image", rclcpp::SensorDataQoS().keep_last(100).reliable().get_rmw_qos_profile(),
+    "camera/image", rclcpp::SensorDataQoS().get_rmw_qos_profile(),
     std::bind(&SubscriberImageTransport::imageCallback, this, _1),
     nullptr, &th, sub_options);
 

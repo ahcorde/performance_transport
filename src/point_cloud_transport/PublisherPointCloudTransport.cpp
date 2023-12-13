@@ -94,22 +94,25 @@ void PublisherPointCloudTransport::PublishMessage()
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  if (reader.has_next()) {
-    auto serialized_message = reader.read_next();
+  try{
+      if (reader.has_next()) {
+      auto serialized_message = reader.read_next();
 
-    while (serialized_message->topic_name != this->rosbag_topic_) {
-      // deserialize and convert to ros2 message
-      serialized_message = reader.read_next();
-      if (!reader.has_next()) {
-        reader.seek(0);
+      while (serialized_message->topic_name != this->rosbag_topic_) {
+        // deserialize and convert to ros2 message
+        serialized_message = reader.read_next();
+        if (!reader.has_next()) {
+          reader.seek(0);
+        }
+      }
+
+      rclcpp::SerializedMessage extracted_serialized_msg(*serialized_message->serialized_data);
+      if (serialized_message->topic_name == this->rosbag_topic_) {
+        image_serialization.deserialize_message(&extracted_serialized_msg, &this->cloud_msg_);
       }
     }
-
-    rclcpp::SerializedMessage extracted_serialized_msg(*serialized_message->serialized_data);
-    if (serialized_message->topic_name == this->rosbag_topic_) {
-      image_serialization.deserialize_message(&extracted_serialized_msg, &this->cloud_msg_);
-    }
-  }
+  } catch (...)
+  {}
 
   this->cloud_msg_.header.stamp = this->now();
   this->cloud_msg_.header.frame_id = "camera_link";
@@ -171,9 +174,7 @@ void PublisherPointCloudTransport::Initialize()
     if (serialized_message->topic_name == this->rosbag_topic_) {
       image_serialization.deserialize_message(&extracted_serialized_msg, &this->cloud_msg_);
     }
-
-  } else if (this->filename_.empty() || // NOLINT
-    pcl::io::loadPCDFile(this->filename_, this->cloud_msg_) == -1)
+  } else if (pcl::io::loadPCDFile(this->filename_, this->cloud_msg_) == -1)
   {
     RCLCPP_ERROR(this->get_logger(), "failed to open PCD file");
     throw std::runtime_error{"could not open PCD file"};
